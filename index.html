@@ -1,302 +1,588 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Instant Lottery Shift Tracker</title>
-  <!-- Tailwind CSS -->
+  <title>Roy's Instant Lottery Shift Tracker</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- HTML5-QRCode Scanner Library -->
-  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
   <style>
-    body { -webkit-tap-highlight-color: transparent; }
-    #reader video { border-radius: 0.5rem; object-fit: cover; }
+    body { background-color: #0b0f17; color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+    @keyframes scanline {
+      0% { top: 12%; opacity: 0.2; }
+      50% { top: 88%; opacity: 1; }
+      100% { top: 12%; opacity: 0.2; }
+    }
+    .scanner-laser {
+      position: absolute; left: 8%; width: 84%; height: 2px;
+      background: #10b981; box-shadow: 0 0 12px 2px #10b981;
+      animation: scanline 1.6s infinite ease-in-out;
+    }
+    #reader video { object-fit: cover !important; border-radius: 1rem; width: 100% !important; height: 100% !important; }
   </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans">
+<body class="min-h-screen flex flex-col pb-28">
 
-  <!-- Top Header -->
-  <header class="bg-slate-800 border-b border-slate-700 p-4 sticky top-0 z-20 shadow-md">
-    <div class="max-w-4xl mx-auto flex flex-wrap items-center justify-between gap-3">
+  <!-- Top Sticky Header -->
+  <header class="sticky top-0 z-30 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-4 py-3 shadow-md">
+    <div class="max-w-5xl mx-auto flex items-center justify-between gap-2">
       <div>
-        <h1 class="text-xl font-bold text-amber-400">Instant Lottery Tracker</h1>
-        <p class="text-xs text-slate-400">70-Slot Continuous Shift Reconciliation</p>
+        <h1 class="text-base font-extrabold text-white tracking-tight flex items-center gap-1.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          Roy's Instant Lottery
+        </h1>
+        <p id="headerSub" class="text-[11px] text-slate-400 font-medium">70-Slot Continuous Shift Tracker</p>
       </div>
-
       <div class="flex items-center gap-2">
-        <select id="cashierSelect" class="bg-slate-700 text-sm rounded-lg px-3 py-2 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-amber-500">
-          <option value="Lynn Shene">Lynn Shene (Manager)</option>
-          <option value="Shannon">Shannon</option>
-          <option value="Jeckie">Jeckie</option>
-        </select>
-
-        <button onclick="exportData()" class="bg-slate-700 hover:bg-slate-600 text-xs px-3 py-2 rounded-lg border border-slate-600">
-          Backup JSON
+        <button onclick="openScannerModal()" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black px-3.5 py-2 rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-emerald-500/25 active:scale-95 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+          Scan Ticket
         </button>
       </div>
     </div>
   </header>
 
-  <!-- Sticky Sales Summary Banner -->
-  <div class="bg-slate-800/90 backdrop-blur border-b border-slate-700 px-4 py-3 sticky top-[73px] z-10 shadow">
-    <div class="max-w-4xl mx-auto flex items-center justify-between">
+  <!-- Main Controls & Financial Summary -->
+  <main class="max-w-5xl w-full mx-auto px-4 mt-3 space-y-3 flex-1">
+    
+    <!-- Shift Meta Header -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs shadow-sm">
       <div>
-        <span class="text-xs uppercase tracking-wider text-slate-400">Total Shift Sales</span>
-        <div id="totalSalesDisplay" class="text-2xl font-extrabold text-emerald-400">$0.00</div>
+        <label class="block text-slate-400 text-[10px] uppercase font-bold tracking-wider mb-1">Date</label>
+        <input type="date" id="shiftDate" onchange="updateDateDisplay()" class="w-full bg-slate-800/90 border border-slate-700/80 text-white rounded-lg p-2 font-medium focus:ring-1 focus:ring-emerald-500 focus:outline-none">
+        <span id="dayLabel" class="text-[10px] text-emerald-400 font-bold mt-1 block"></span>
       </div>
       <div>
-        <span class="text-xs uppercase tracking-wider text-slate-400">Tickets Counted</span>
-        <div id="totalTicketsDisplay" class="text-lg font-bold text-slate-200">0</div>
+        <label class="block text-slate-400 text-[10px] uppercase font-bold tracking-wider mb-1">Shift</label>
+        <select id="shiftSelect" onchange="changeShift(this.value)" class="w-full bg-slate-800/90 border border-slate-700/80 text-white rounded-lg p-2 font-medium focus:ring-1 focus:ring-emerald-500 focus:outline-none">
+          <option value="1">Shift 1 (Day / Open)</option>
+          <option value="2">Shift 2 (Mid / Close)</option>
+          <option value="3">Shift 3 (Night)</option>
+        </select>
       </div>
-      <button onclick="rollForwardShift()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs px-4 py-2.5 rounded-lg shadow transition">
-        Roll Shift &rarr;
-      </button>
+      <div>
+        <label class="block text-slate-400 text-[10px] uppercase font-bold tracking-wider mb-1">Cashier</label>
+        <select id="employeeSelect" onchange="saveCurrentEmployee()" class="w-full bg-slate-800/90 border border-slate-700/80 text-white rounded-lg p-2 font-medium focus:ring-1 focus:ring-emerald-500 focus:outline-none">
+          <option value="Lynn Shene">Lynn Shene (Manager)</option>
+          <option value="Shannon">Shannon</option>
+          <option value="Jeckie">Jeckie</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-slate-400 text-[10px] uppercase font-bold tracking-wider mb-1">Progress</label>
+        <div class="bg-slate-800/90 border border-slate-700/80 rounded-lg p-2 text-center">
+          <span id="scannedCount" class="font-black text-emerald-400 text-sm">0 / 70</span>
+          <span class="text-[10px] text-slate-400 block font-medium">Slots Scanned</span>
+        </div>
+      </div>
     </div>
-  </div>
 
-  <!-- Slot Grid List -->
-  <main class="flex-1 max-w-4xl w-full mx-auto p-4 space-y-3 pb-24">
-    <div id="slotsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-3">
-      <!-- 70 Slots injected dynamically -->
+    <!-- Financial Card Banner -->
+    <div class="bg-gradient-to-r from-slate-900 via-slate-900 to-slate-850 border border-slate-800 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3 shadow-sm">
+      <div>
+        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Calculated Shift Sales</p>
+        <p id="shiftTotalMoney" class="text-3xl sm:text-4xl font-black text-emerald-400 tracking-tight">$0.00</p>
+        <p id="shiftTotalTickets" class="text-xs text-slate-400 font-medium mt-0.5">0 tickets sold across 70 slots</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="exportDataJSON()" title="Download Backup JSON" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold p-2.5 rounded-xl border border-slate-700 text-xs transition">
+          &#128190;
+        </button>
+        <button onclick="closeAndRollShift()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-black px-4 py-3 rounded-xl text-xs active:scale-95 transition shadow-lg shadow-emerald-600/20 text-center">
+          Save Shift &<br><span class="text-emerald-200">Roll Forward</span>
+        </button>
+      </div>
     </div>
+
+    <!-- Filter Pills -->
+    <div class="flex items-center justify-between pt-1">
+      <div class="flex gap-1.5 bg-slate-900 p-1 rounded-xl border border-slate-800">
+        <button onclick="setFilter('all')" id="btnFilterAll" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-500 text-slate-950 transition">All (70)</button>
+        <button onclick="setFilter('pending')" id="btnFilterPending" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition">Pending</button>
+        <button onclick="setFilter('scanned')" id="btnFilterScanned" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition">Scanned</button>
+      </div>
+      <span id="lastScanBadge" class="text-[11px] font-mono text-slate-400 hidden sm:inline">Ready to scan</span>
+    </div>
+
+    <!-- 70 Bins Grid -->
+    <div id="binsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5 pt-1"></div>
   </main>
 
-  <!-- Camera Scanner Modal -->
-  <div id="scannerModal" class="fixed inset-0 bg-black/80 z-50 flex flex-col items-center justify-center p-4 hidden">
-    <div class="bg-slate-800 border border-slate-700 rounded-xl w-full max-w-md p-4 flex flex-col items-center">
-      <div class="w-full flex justify-between items-center mb-3">
-        <h3 id="modalSlotTitle" class="text-base font-bold text-amber-400">Scan Slot</h3>
-        <button onclick="closeScanner()" class="text-slate-400 hover:text-white text-xl font-bold p-1">&times;</button>
+  <!-- Fast In-Page Camera Modal -->
+  <div id="cameraModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex flex-col items-center justify-center p-3 hidden">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-sm overflow-hidden flex flex-col shadow-2xl">
+      
+      <!-- Modal Header -->
+      <div class="p-3 bg-slate-850 border-b border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="text-xs font-extrabold text-white tracking-wide uppercase">Scan Instant Ticket</span>
+        </div>
+        <button onclick="closeScannerModal()" class="text-slate-400 hover:text-white text-base font-bold px-2 py-1 rounded-lg">&times;</button>
       </div>
 
-      <div id="reader" class="w-full h-64 bg-black rounded-lg overflow-hidden border border-slate-600"></div>
+      <!-- Viewfinder Container -->
+      <div class="relative w-full h-72 bg-black flex items-center justify-center overflow-hidden">
+        <div id="reader" class="w-full h-full"></div>
+        
+        <!-- Framing Target & Laser -->
+        <div class="absolute w-56 h-36 border-2 border-emerald-400/80 rounded-2xl pointer-events-none flex flex-col items-center justify-between p-2 shadow-2xl">
+          <span class="text-[9px] text-emerald-300 font-mono bg-black/70 px-2 py-0.5 rounded-full tracking-wider">FIT BARCODE HERE</span>
+          <div class="scanner-laser"></div>
+          <span class="text-[9px] text-slate-300 font-mono bg-black/70 px-2 py-0.5 rounded-full">FRONT TICKET BARCODE</span>
+        </div>
+      </div>
 
-      <p class="text-xs text-slate-400 mt-3 text-center">
-        Point camera at the ticket barcode (validation code or ticket back).
-      </p>
-
-      <button onclick="closeScanner()" class="mt-4 w-full bg-slate-700 hover:bg-slate-600 text-sm font-semibold py-2 rounded-lg">
-        Cancel
-      </button>
+      <!-- Live Detection Feedback -->
+      <div class="p-3 bg-slate-900 border-t border-slate-800 text-center">
+        <p id="cameraStatusText" class="text-xs text-slate-300 font-medium">Point camera at the validation barcode on the front of the next ticket.</p>
+        <button onclick="closeScannerModal()" class="mt-3 w-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold py-2.5 rounded-xl border border-slate-700">
+          Done Scanning
+        </button>
+      </div>
     </div>
   </div>
 
   <script>
-    const TOTAL_SLOTS = 70;
-    let slots = [];
-    let activeSlotIndex = null;
+    const DEFAULT_DENOMINATIONS = [1, 1, 1, 1, 2, 2, 2, 2, 5, 5, 5, 5, 10, 10, 10, 20, 20, 30, 50];
+    let bins = [];
+    let currentShift = 1;
+    let currentFilter = 'all';
     let html5QrCode = null;
+    let isScannerRunning = false;
+    let lastScanTime = 0;
 
-    // Initialize Slots Data
-    function initData() {
-      const saved = localStorage.getItem('lottery_slots_data');
+    // Initialize 70 Slots
+    function initBins() {
+      const saved = localStorage.getItem('roys_lottery_bins_v2');
       if (saved) {
         try {
-          slots = JSON.parse(saved);
+          bins = JSON.parse(saved);
         } catch (e) {
-          slots = generateDefaultSlots();
+          bins = generate70Slots();
         }
       } else {
-        slots = generateDefaultSlots();
+        bins = generate70Slots();
       }
-      renderSlots();
-      calculateTotals();
+      saveBins();
     }
 
-    function generateDefaultSlots() {
+    function generate70Slots() {
       const arr = [];
-      const defaultPrices = [1, 2, 5, 10, 20, 30, 50];
-      for (let i = 1; i <= TOTAL_SLOTS; i++) {
+      for (let i = 1; i <= 70; i++) {
         let price = 5;
-        if (i <= 10) price = 1;
-        else if (i <= 20) price = 2;
-        else if (i <= 40) price = 5;
-        else if (i <= 55) price = 10;
-        else if (i <= 65) price = 20;
+        if (i <= 8) price = 1;
+        else if (i <= 18) price = 2;
+        else if (i <= 42) price = 5;
+        else if (i <= 56) price = 10;
+        else if (i <= 66) price = 20;
         else price = 30;
 
         arr.push({
-          slotNumber: i,
-          gameName: `Game Slot ${i}`,
+          slot: i,
+          gameId: (1000 + i).toString(), // Default 4-digit Michigan Game ID format
+          gameName: `$${price} Game Slot ${i}`,
           price: price,
-          startTicket: 0,
-          endTicket: 0,
-          packNumber: ''
+          open: 0,
+          close: null,
+          scanned: false
         });
       }
       return arr;
     }
 
-    function saveState() {
-      localStorage.setItem('lottery_slots_data', JSON.stringify(slots));
-      calculateTotals();
+    function saveBins() {
+      localStorage.setItem('roys_lottery_bins_v2', JSON.stringify(bins));
+      renderBins();
     }
 
-    // Render Slots into DOM
-    function renderSlots() {
-      const container = document.getElementById('slotsContainer');
-      container.innerHTML = '';
+    function renderBins() {
+      const grid = document.getElementById('binsGrid');
+      grid.innerHTML = '';
+      let scannedTotal = 0;
+      let totalMoney = 0;
+      let totalTickets = 0;
 
-      slots.forEach((slot, index) => {
-        const sold = Math.max(0, (Number(slot.endTicket) || 0) - (Number(slot.startTicket) || 0));
-        const slotTotal = sold * slot.price;
+      bins.forEach((bin, idx) => {
+        const sold = bin.close !== null ? Math.max(0, bin.close - bin.open) : 0;
+        const binAmount = sold * bin.price;
+        if (bin.scanned) scannedTotal++;
+        totalMoney += binAmount;
+        totalTickets += sold;
+
+        if (currentFilter === 'pending' && bin.scanned) return;
+        if (currentFilter === 'scanned' && !bin.scanned) return;
 
         const card = document.createElement('div');
-        card.className = "bg-slate-800 border border-slate-700/80 rounded-xl p-3 flex flex-col gap-2 shadow-sm";
+        card.id = `bin-card-${bin.slot}`;
+        card.className = `p-3 rounded-2xl border transition-all ${
+          bin.scanned 
+            ? 'bg-slate-900/90 border-emerald-500/70 shadow-sm ring-1 ring-emerald-500/30' 
+            : 'bg-slate-900/60 border-slate-800/90 hover:border-slate-700'
+        }`;
+
         card.innerHTML = `
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <span class="bg-slate-700 text-amber-400 font-bold text-xs px-2 py-1 rounded">#${slot.slotNumber}</span>
-              <input type="text" value="${slot.gameName}" onchange="updateSlot(${index}, 'gameName', this.value)" 
-                     class="bg-transparent border-b border-transparent focus:border-slate-500 font-semibold text-sm focus:outline-none w-36 truncate" />
-            </div>
-            <select onchange="updateSlot(${index}, 'price', Number(this.value))" 
-                    class="bg-slate-700 text-xs font-bold text-amber-400 rounded px-2 py-1 border border-slate-600 focus:outline-none">
-              ${[1, 2, 5, 10, 20, 30, 50].map(p => `<option value="${p}" ${slot.price === p ? 'selected' : ''}>$${p}</option>`).join('')}
+          <div class="flex items-center justify-between text-xs mb-1.5">
+            <span class="font-extrabold text-white text-xs">#${bin.slot}</span>
+            <select onchange="updateBinPrice(${idx}, Number(this.value))" 
+                    class="font-black px-1.5 py-0.5 rounded text-[10px] ${bin.price >= 20 ? 'bg-amber-400 text-slate-950' : 'bg-slate-800 text-emerald-400'} border border-slate-700 focus:outline-none">
+              ${[1, 2, 5, 10, 20, 30, 50].map(p => `<option value="${p}" ${bin.price === p ? 'selected' : ''}>$${p}</option>`).join('')}
             </select>
           </div>
 
-          <div class="grid grid-cols-2 gap-2 mt-1">
-            <div>
-              <label class="text-[10px] uppercase text-slate-400 font-semibold">Start Ticket</label>
-              <input type="number" value="${slot.startTicket}" onchange="updateSlot(${index}, 'startTicket', Number(this.value))" 
-                     class="w-full bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-sm font-mono text-center focus:ring-1 focus:ring-amber-500 focus:outline-none" />
-            </div>
-            <div>
-              <label class="text-[10px] uppercase text-slate-400 font-semibold">End Ticket</label>
-              <div class="flex gap-1">
-                <input type="number" value="${slot.endTicket}" onchange="updateSlot(${index}, 'endTicket', Number(this.value))" 
-                       class="w-full bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-sm font-mono text-center focus:ring-1 focus:ring-amber-500 focus:outline-none" />
-                <button onclick="openScanner(${index})" class="bg-amber-500 hover:bg-amber-400 text-slate-950 px-2.5 rounded-lg flex items-center justify-center font-bold">
-                  &#128247;
-                </button>
-              </div>
+          <div class="space-y-0.5 mb-2">
+            <input type="text" value="${bin.gameName}" 
+                   onchange="updateBinField(${idx}, 'gameName', this.value)"
+                   class="w-full bg-transparent border-b border-transparent hover:border-slate-700 focus:border-slate-500 text-[11px] text-slate-200 font-semibold focus:outline-none truncate" />
+            <div class="flex items-center gap-1">
+              <span class="text-[9px] text-slate-400 uppercase font-mono font-bold">Game ID:</span>
+              <input type="text" value="${bin.gameId}" 
+                     onchange="updateBinField(${idx}, 'gameId', this.value.trim())" 
+                     placeholder="e.g. 1042"
+                     class="w-16 bg-slate-950/60 rounded px-1 text-[10px] font-mono text-amber-400 border border-slate-800 focus:outline-none text-center" />
             </div>
           </div>
 
-          <div class="flex justify-between items-center text-xs pt-1 border-t border-slate-700/60 mt-1">
-            <span class="text-slate-400">Sold: <strong class="text-slate-200">${sold}</strong></span>
-            <span class="text-slate-400">Total: <strong class="text-emerald-400">$${slotTotal.toFixed(2)}</strong></span>
+          <div class="grid grid-cols-2 gap-1.5 text-[11px] font-mono">
+            <div class="bg-slate-950/60 p-1.5 rounded-xl border border-slate-800/80 text-center">
+              <span class="text-[8px] text-slate-400 font-bold block uppercase">Open</span>
+              <input type="number" value="${bin.open}" 
+                     onchange="updateBinField(${idx}, 'open', parseInt(this.value, 10) || 0)"
+                     class="w-full bg-transparent text-center font-bold text-slate-300 focus:outline-none" />
+            </div>
+            <div class="bg-slate-950/60 p-1.5 rounded-xl border ${bin.scanned ? 'border-emerald-500/50 bg-emerald-950/10' : 'border-slate-800/80'} text-center">
+              <span class="text-[8px] ${bin.scanned ? 'text-emerald-400' : 'text-slate-400'} font-bold block uppercase">Close</span>
+              <input type="number" value="${bin.close !== null ? bin.close : ''}" placeholder="--" 
+                     onchange="manualCloseInput(${bin.slot}, this.value)"
+                     class="w-full bg-transparent text-center font-black ${bin.scanned ? 'text-emerald-400' : 'text-slate-300'} focus:outline-none" />
+            </div>
+          </div>
+
+          <div class="mt-2 pt-1.5 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
+            <span class="text-slate-400 text-[10px]">${sold} sold</span>
+            <span class="font-extrabold ${binAmount > 0 ? 'text-emerald-400' : 'text-slate-400'}">$${binAmount.toFixed(2)}</span>
           </div>
         `;
-        container.appendChild(card);
-      });
-    }
-
-    function updateSlot(index, field, value) {
-      slots[index][field] = value;
-      saveState();
-      renderSlots();
-    }
-
-    function calculateTotals() {
-      let totalAmount = 0;
-      let totalTickets = 0;
-
-      slots.forEach(slot => {
-        const sold = Math.max(0, (Number(slot.endTicket) || 0) - (Number(slot.startTicket) || 0));
-        totalTickets += sold;
-        totalAmount += sold * slot.price;
+        grid.appendChild(card);
       });
 
-      document.getElementById('totalSalesDisplay').textContent = `$${totalAmount.toFixed(2)}`;
-      document.getElementById('totalTicketsDisplay').textContent = totalTickets;
+      document.getElementById('scannedCount').innerText = `${scannedTotal} / 70`;
+      document.getElementById('shiftTotalMoney').innerText = `$${totalMoney.toFixed(2)}`;
+      document.getElementById('shiftTotalTickets').innerText = `${totalTickets} tickets sold`;
     }
 
-    // Roll Forward for Next Shift
-    function rollForwardShift() {
-      const cashier = document.getElementById('cashierSelect').value;
-      if (!confirm(`Complete shift for ${cashier}?\nThis will advance all End tickets to Start tickets for the next shift.`)) {
+    function updateBinField(idx, field, val) {
+      bins[idx][field] = val;
+      saveBins();
+    }
+
+    function updateBinPrice(idx, price) {
+      bins[idx].price = price;
+      saveBins();
+    }
+
+    function manualCloseInput(slotNum, val) {
+      const bin = bins.find(b => b.slot === slotNum);
+      if (bin) {
+        bin.close = val === '' ? null : parseInt(val, 10);
+        bin.scanned = val !== '';
+        saveBins();
+      }
+    }
+
+    function setFilter(type) {
+      currentFilter = type;
+      ['all', 'pending', 'scanned'].forEach(f => {
+        const btn = document.getElementById(`btnFilter${f.charAt(0).toUpperCase() + f.slice(1)}`);
+        if (f === type) {
+          btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-500 text-slate-950 transition";
+        } else {
+          btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition";
+        }
+      });
+      renderBins();
+    }
+
+    // ========================================================
+    // TICKET BARCODE EXTRACTION & SMART DISPATCHER
+    // ========================================================
+    function parseLotteryBarcode(rawText) {
+      const digits = rawText.replace(/[^0-9]/g, '');
+      let detectedGame = null;
+      let detectedTicket = null;
+
+      // Format A: Standard 24-digit Michigan Validation Barcode (GGGG-PPPPPP-TTT-VVVVVVVVVV)
+      if (digits.length >= 13) {
+        detectedGame = digits.substring(0, 4);
+        detectedTicket = parseInt(digits.substring(10, 13), 10);
+      } 
+      // Format B: Hyphenated Barcode (e.g., 0451-123456-024)
+      else if (rawText.includes('-')) {
+        const parts = rawText.split('-');
+        if (parts.length >= 3) {
+          detectedGame = parts[0].replace(/[^0-9]/g, '');
+          detectedTicket = parseInt(parts[2].replace(/[^0-9]/g, ''), 10);
+        }
+      } 
+      // Format C: Short Barcode / Trailing Ticket Suffix
+      else if (digits.length >= 3) {
+        detectedTicket = parseInt(digits.substring(digits.length - 3), 10);
+      }
+
+      return { detectedGame, detectedTicket, raw: rawText };
+    }
+
+    function routeScannedTicket(rawText) {
+      const { detectedGame, detectedTicket } = parseLotteryBarcode(rawText);
+      
+      if (detectedTicket === null || isNaN(detectedTicket)) {
+        updateCameraStatus(`<span class="text-rose-400 font-bold">Unrecognized code format: ${rawText}</span>`);
         return;
       }
 
-      slots.forEach(slot => {
-        slot.startTicket = slot.endTicket;
-      });
+      // Try matching by Game ID first
+      let matchedBin = null;
+      if (detectedGame) {
+        matchedBin = bins.find(b => b.gameId === detectedGame || b.gameId === parseInt(detectedGame, 10).toString());
+      }
 
-      saveState();
-      renderSlots();
-      alert(`Shift completed. Start tickets rolled forward.`);
+      // Fallback: If game is not yet bound to a slot, assign to next unscanned slot
+      if (!matchedBin) {
+        matchedBin = bins.find(b => !b.scanned);
+        if (matchedBin && detectedGame) {
+          matchedBin.gameId = detectedGame;
+          matchedBin.gameName = `$${matchedBin.price} Game (${detectedGame})`;
+        }
+      }
+
+      if (matchedBin) {
+        matchedBin.close = detectedTicket;
+        matchedBin.scanned = true;
+        saveBins();
+
+        // Audio & Haptic feedback
+        playBeep();
+        if (navigator.vibrate) navigator.vibrate([70, 50, 70]);
+
+        updateCameraStatus(`
+          <span class="text-emerald-400 font-black">✔ Slot #${matchedBin.slot} Scanned!</span><br>
+          <span class="text-slate-300 font-mono text-[11px]">Game ${matchedBin.gameId} &bull; Close: ${detectedTicket}</span>
+        `);
+
+        // Highlight card in background
+        const cardElem = document.getElementById(`bin-card-${matchedBin.slot}`);
+        if (cardElem) {
+          cardElem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      } else {
+        updateCameraStatus(`<span class="text-amber-400 font-bold">All 70 slots already scanned!</span>`);
+      }
     }
 
-    // Camera Scanner Handling
-    function openScanner(slotIndex) {
-      activeSlotIndex = slotIndex;
-      const slot = slots[slotIndex];
-      document.getElementById('modalSlotTitle').textContent = `Scan Slot #${slot.slotNumber} ($${slot.price})`;
-      document.getElementById('scannerModal').classList.remove('hidden');
+    function updateCameraStatus(html) {
+      document.getElementById('cameraStatusText').innerHTML = html;
+      document.getElementById('lastScanBadge').innerHTML = html;
+    }
 
-      html5QrCode = new Html5Qrcode("reader");
-      const config = { fps: 15, qrbox: { width: 250, height: 160 }, aspectRatio: 1.33 };
+    function playBeep() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime); // High pleasant chime
+        gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.12);
+      } catch (e) {}
+    }
+
+    // ========================================================
+    // CAMERA SCANNER CONTROLS
+    // ========================================================
+    function openScannerModal() {
+      document.getElementById('cameraModal').classList.remove('hidden');
+      document.getElementById('cameraStatusText').innerText = "Ready. Point at ticket barcode...";
+
+      if (!html5QrCode) {
+        html5QrCode = new Html5Qrcode("reader");
+      }
+
+      const qrConfig = {
+        fps: 20,
+        qrbox: { width: 260, height: 140 },
+        aspectRatio: 1.0,
+        experimentalFeatures: { useBarCodeDetectorIfSupported: true }
+      };
 
       html5QrCode.start(
         { facingMode: "environment" },
-        config,
+        qrConfig,
         (decodedText) => {
-          handleScannedBarcode(decodedText);
+          const now = Date.now();
+          if (now - lastScanTime < 1400) return; // Prevent duplicate rapid triggers
+          lastScanTime = now;
+          routeScannedTicket(decodedText);
         },
         () => {}
-      ).catch(err => {
-        alert("Camera error: " + err);
-        closeScanner();
+      ).then(() => {
+        isScannerRunning = true;
+      }).catch(err => {
+        document.getElementById('cameraStatusText').innerHTML = `
+          <span class="text-rose-400 font-bold">Camera Access Error: ${err}. Ensure HTTPS and camera permission are enabled.</span>
+        `;
       });
     }
 
-    function handleScannedBarcode(rawBarcode) {
-      // Clean string
-      const clean = rawBarcode.trim();
-      let ticketNum = null;
-
-      // Michigan Lottery 24-digit validation barcode parsing:
-      // Typically: GGGG-PPPPPP-TTT-VVVV (Game 4, Pack 6, Ticket 3, Validation 11)
-      if (clean.length >= 13 && !isNaN(clean)) {
-        ticketNum = parseInt(clean.substring(10, 13), 10);
-      } else if (clean.includes('-')) {
-        const parts = clean.split('-');
-        if (parts.length >= 3) {
-          ticketNum = parseInt(parts[2], 10);
-        }
-      } else {
-        // Fallback: extract last 2 or 3 digits
-        const match = clean.match(/(\d{2,3})$/);
-        if (match) ticketNum = parseInt(match[1], 10);
-      }
-
-      if (ticketNum !== null && !isNaN(ticketNum)) {
-        slots[activeSlotIndex].endTicket = ticketNum;
-        saveState();
-        renderSlots();
-        closeScanner();
-      } else {
-        alert(`Barcode detected (${clean}), could not determine ticket number. Please enter manually.`);
-      }
-    }
-
-    function closeScanner() {
-      if (html5QrCode) {
+    function closeScannerModal() {
+      if (html5QrCode && isScannerRunning) {
         html5QrCode.stop().then(() => {
           html5QrCode.clear();
-          document.getElementById('scannerModal').classList.add('hidden');
+          isScannerRunning = false;
+          document.getElementById('cameraModal').classList.add('hidden');
         }).catch(() => {
-          document.getElementById('scannerModal').classList.add('hidden');
+          document.getElementById('cameraModal').classList.add('hidden');
+          isScannerRunning = false;
         });
       } else {
-        document.getElementById('scannerModal').classList.add('hidden');
+        document.getElementById('cameraModal').classList.add('hidden');
       }
-      activeSlotIndex = null;
     }
 
-    function exportData() {
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(slots, null, 2));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `lottery_shift_${new Date().toISOString().split('T')[0]}.json`);
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
+   // -------------------------------------------------------------
+    // REPLACE THIS URL WITH YOUR DEPLOYED GOOGLE APPS SCRIPT WEB APP URL
+    const GOOGLE_SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbz-LOpBatFlViqL_Jmuolou6kLOBAOg5TqElU9W4kUU-Sdi_Gd6m_CgBjh_Y6tHB-JP/exec";
+    // -------------------------------------------------------------
+
+    function closeAndRollShift() {
+      const cashier = document.getElementById('employeeSelect').value;
+      const date = document.getElementById('shiftDate').value;
+      const day = document.getElementById('dayLabel').innerText;
+
+      let totalSold = 0;
+      let totalAmount = 0;
+
+      bins.forEach(b => {
+        const sold = b.close !== null ? Math.max(0, b.close - b.open) : 0;
+        totalSold += sold;
+        totalAmount += sold * b.price;
+      });
+
+      if (!confirm(`Save & Complete Shift ${currentShift} for ${cashier}?\nTotal Tickets Sold: ${totalSold}\nTotal Sales: $${totalAmount.toFixed(2)}\n\nThis will transfer data to Google Sheets and roll numbers forward.`)) {
+        return;
+      }
+
+      document.getElementById('headerSub').innerText = "Syncing to Google Sheets...";
+
+      const payload = {
+        date: date,
+        day: day,
+        shift: currentShift,
+        cashier: cashier,
+        totalTicketsSold: totalSold,
+        totalSalesAmount: totalAmount,
+        bins: bins.map(b => ({
+          slot: b.slot,
+          gameId: b.gameId,
+          name: b.gameName,
+          price: b.price,
+          open: b.open,
+          close: b.close !== null ? b.close : b.open,
+          sold: b.close !== null ? Math.max(0, b.close - b.open) : 0
+        }))
+      };
+
+      // Send data to Google Sheets via Webhook
+      fetch(GOOGLE_SHEET_WEBHOOK_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      })
+      .then(() => {
+        alert(`Shift ${currentShift} synced to Google Sheets successfully!`);
+        executeLocalRoll();
+      })
+      .catch(err => {
+        alert("Warning: Could not sync online (" + err + "). Shift rolled locally.");
+        executeLocalRoll();
+      });
+
+      function executeLocalRoll() {
+        bins.forEach(b => {
+          b.open = b.close !== null ? b.close : b.open;
+          b.close = null;
+          b.scanned = false;
+        });
+        saveBins();
+
+        currentShift = currentShift >= 3 ? 1 : currentShift + 1;
+        document.getElementById('shiftSelect').value = currentShift;
+        document.getElementById('headerSub').innerText = `Shift ${currentShift} Active`;
+      }
+    }
+    
+      // Handle roll forward locally
+      function executeLocalRoll() {
+        bins.forEach(b => {
+          b.open = b.close !== null ? b.close : b.open;
+          b.close = null;
+          b.scanned = false;
+        });
+        saveBins();
+
+        currentShift = currentShift >= 3 ? 1 : currentShift + 1;
+        document.getElementById('shiftSelect').value = currentShift;
+        document.getElementById('headerSub').innerText = `Shift ${currentShift} Active`;
+        alert(`Shift completed successfully! Rolls saved.`);
+      }
+
+      // Check if running inside Google Apps Script
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(function() {
+            executeLocalRoll();
+          })
+          .withFailureHandler(function(err) {
+            alert("Notice: Could not write directly to Sheet (" + err + "). Shift rolled locally.");
+            executeLocalRoll();
+          })
+          .recordShift(JSON.stringify(payload));
+      } else {
+        executeLocalRoll();
+      }
     }
 
-    window.onload = initData;
+    function exportDataJSON() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(bins, null, 2));
+      const dl = document.createElement('a');
+      dl.setAttribute("href", dataStr);
+      dl.setAttribute("download", `roys_lottery_shift_${document.getElementById('shiftDate').value}.json`);
+      document.body.appendChild(dl);
+      dl.click();
+      dl.remove();
+    }
+
+    function updateDateDisplay() {
+      const picker = document.getElementById('shiftDate');
+      if (!picker.value) picker.value = new Date().toISOString().split('T')[0];
+      const parts = picker.value.split('-');
+      const d = new Date(parts[0], parts[1] - 1, parts[2]);
+      const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      document.getElementById('dayLabel').innerText = days[d.getDay()];
+    }
+
+    function changeShift(val) { currentShift = parseInt(val, 10); }
+    function saveCurrentEmployee() { localStorage.setItem('roys_lottery_employee', document.getElementById('employeeSelect').value); }
+
+    window.onload = function() {
+      initBins();
+      updateDateDisplay();
+      const savedEmp = localStorage.getItem('roys_lottery_employee');
+      if (savedEmp) document.getElementById('employeeSelect').value = savedEmp;
+    };
   </script>
 </body>
 </html>
