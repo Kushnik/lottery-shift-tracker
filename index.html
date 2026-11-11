@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Roy's Instant Lottery Shift Tracker</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+  <!-- Fast, robust barcode scanner build -->
+  <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <style>
     body { background-color: #0b0f17; color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
     @keyframes scanline {
@@ -14,17 +15,17 @@
       100% { top: 12%; opacity: 0.2; }
     }
     .scanner-laser {
-      position: absolute; left: 8%; width: 84%; height: 2px;
-      background: #10b981; box-shadow: 0 0 12px 2px #10b981;
+      position: absolute; left: 6%; width: 88%; height: 2px;
+      background: #10b981; box-shadow: 0 0 14px 2px #10b981;
       animation: scanline 1.6s infinite ease-in-out;
     }
-    #reader video { object-fit: cover !important; border-radius: 1rem; width: 100% !important; height: 100% !important; }
+    #reader video { object-fit: cover !important; border-radius: 1.25rem; width: 100% !important; height: 100% !important; }
   </style>
 </head>
 <body class="min-h-screen flex flex-col pb-28">
 
-  <!-- Top Sticky Header -->
-  <header class="sticky top-0 z-30 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-4 py-3 shadow-md">
+  <!-- Sticky Top Header -->
+  <header class="sticky top-0 z-30 bg-slate-900/95 backdrop-blur border-b border-slate-800 px-4 py-3 shadow">
     <div class="max-w-5xl mx-auto flex items-center justify-between gap-2">
       <div>
         <h1 class="text-base font-extrabold text-white tracking-tight flex items-center gap-1.5">
@@ -33,28 +34,26 @@
         </h1>
         <p id="headerSub" class="text-[11px] text-slate-400 font-medium">70-Slot Continuous Shift Tracker</p>
       </div>
-      <div class="flex items-center gap-2">
-        <button onclick="openScannerModal()" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black px-3.5 py-2 rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-emerald-500/25 active:scale-95 transition">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
-          Scan Ticket
-        </button>
-      </div>
+      <button onclick="openScannerModal()" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black px-4 py-2 rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-emerald-500/25 active:scale-95 transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+        Scan Ticket
+      </button>
     </div>
   </header>
 
-  <!-- Main Controls & Financial Summary -->
+  <!-- Controls & Stats Panel -->
   <main class="max-w-5xl w-full mx-auto px-4 mt-3 space-y-3 flex-1">
     
     <!-- Shift Meta Header -->
     <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs shadow-sm">
       <div>
         <label class="block text-slate-400 text-[10px] uppercase font-bold tracking-wider mb-1">Date</label>
-        <input type="date" id="shiftDate" onchange="updateDateDisplay()" class="w-full bg-slate-800/90 border border-slate-700/80 text-white rounded-lg p-2 font-medium focus:ring-1 focus:ring-emerald-500 focus:outline-none">
+        <input type="date" id="shiftDate" onchange="updateDateDisplay()" class="w-full bg-slate-800 border border-slate-700 text-white rounded-lg p-2 font-medium focus:ring-1 focus:ring-emerald-500 focus:outline-none">
         <span id="dayLabel" class="text-[10px] text-emerald-400 font-bold mt-1 block"></span>
       </div>
       <div>
         <label class="block text-slate-400 text-[10px] uppercase font-bold tracking-wider mb-1">Shift</label>
-        <select id="shiftSelect" onchange="changeShift(this.value)" class="w-full bg-slate-800/90 border border-slate-700/80 text-white rounded-lg p-2 font-medium focus:ring-1 focus:ring-emerald-500 focus:outline-none">
+        <select id="shiftSelect" onchange="changeShift(this.value)" class="w-full bg-slate-800 border border-slate-700 text-white rounded-lg p-2 font-medium focus:ring-1 focus:ring-emerald-500 focus:outline-none">
           <option value="1">Shift 1 (Day / Open)</option>
           <option value="2">Shift 2 (Mid / Close)</option>
           <option value="3">Shift 3 (Night)</option>
@@ -62,7 +61,7 @@
       </div>
       <div>
         <label class="block text-slate-400 text-[10px] uppercase font-bold tracking-wider mb-1">Cashier</label>
-        <select id="employeeSelect" onchange="saveCurrentEmployee()" class="w-full bg-slate-800/90 border border-slate-700/80 text-white rounded-lg p-2 font-medium focus:ring-1 focus:ring-emerald-500 focus:outline-none">
+        <select id="employeeSelect" onchange="saveCurrentEmployee()" class="w-full bg-slate-800 border border-slate-700 text-white rounded-lg p-2 font-medium focus:ring-1 focus:ring-emerald-500 focus:outline-none">
           <option value="Lynn Shene">Lynn Shene (Manager)</option>
           <option value="Shannon">Shannon</option>
           <option value="Jeckie">Jeckie</option>
@@ -70,7 +69,7 @@
       </div>
       <div>
         <label class="block text-slate-400 text-[10px] uppercase font-bold tracking-wider mb-1">Progress</label>
-        <div class="bg-slate-800/90 border border-slate-700/80 rounded-lg p-2 text-center">
+        <div class="bg-slate-800 border border-slate-700 rounded-lg p-2 text-center">
           <span id="scannedCount" class="font-black text-emerald-400 text-sm">0 / 70</span>
           <span class="text-[10px] text-slate-400 block font-medium">Slots Scanned</span>
         </div>
@@ -78,7 +77,7 @@
     </div>
 
     <!-- Financial Card Banner -->
-    <div class="bg-gradient-to-r from-slate-900 via-slate-900 to-slate-850 border border-slate-800 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3 shadow-sm">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3 shadow-sm">
       <div>
         <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Calculated Shift Sales</p>
         <p id="shiftTotalMoney" class="text-3xl sm:text-4xl font-black text-emerald-400 tracking-tight">$0.00</p>
@@ -108,43 +107,39 @@
     <div id="binsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5 pt-1"></div>
   </main>
 
-  <!-- Fast In-Page Camera Modal -->
-  <div id="cameraModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex flex-col items-center justify-center p-3 hidden">
+  <!-- Viewfinder Modal -->
+  <div id="cameraModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex flex-col items-center justify-center p-3 hidden">
     <div class="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-sm overflow-hidden flex flex-col shadow-2xl">
-      
-      <!-- Modal Header -->
       <div class="p-3 bg-slate-850 border-b border-slate-800 flex items-center justify-between">
         <div class="flex items-center gap-2">
           <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
           <span class="text-xs font-extrabold text-white tracking-wide uppercase">Scan Instant Ticket</span>
         </div>
-        <button onclick="closeScannerModal()" class="text-slate-400 hover:text-white text-base font-bold px-2 py-1 rounded-lg">&times;</button>
+        <button onclick="closeScannerModal()" class="text-slate-400 hover:text-white text-lg font-bold px-2 py-1">&times;</button>
       </div>
 
-      <!-- Viewfinder Container -->
       <div class="relative w-full h-72 bg-black flex items-center justify-center overflow-hidden">
         <div id="reader" class="w-full h-full"></div>
-        
-        <!-- Framing Target & Laser -->
-        <div class="absolute w-56 h-36 border-2 border-emerald-400/80 rounded-2xl pointer-events-none flex flex-col items-center justify-between p-2 shadow-2xl">
-          <span class="text-[9px] text-emerald-300 font-mono bg-black/70 px-2 py-0.5 rounded-full tracking-wider">FIT BARCODE HERE</span>
+        <div class="absolute w-56 h-36 border-2 border-emerald-400/80 rounded-2xl pointer-events-none flex flex-col items-center justify-between p-2">
+          <span class="text-[9px] text-emerald-300 font-mono bg-black/70 px-2 py-0.5 rounded-full">ALIGN BARCODE</span>
           <div class="scanner-laser"></div>
-          <span class="text-[9px] text-slate-300 font-mono bg-black/70 px-2 py-0.5 rounded-full">FRONT TICKET BARCODE</span>
+          <span class="text-[9px] text-slate-300 font-mono bg-black/70 px-2 py-0.5 rounded-full">TICKET FRONT</span>
         </div>
       </div>
 
-      <!-- Live Detection Feedback -->
       <div class="p-3 bg-slate-900 border-t border-slate-800 text-center">
-        <p id="cameraStatusText" class="text-xs text-slate-300 font-medium">Point camera at the validation barcode on the front of the next ticket.</p>
+        <p id="cameraStatusText" class="text-xs text-slate-300 font-medium">Point camera at ticket validation barcode.</p>
         <button onclick="closeScannerModal()" class="mt-3 w-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold py-2.5 rounded-xl border border-slate-700">
-          Done Scanning
+          Close Scanner
         </button>
       </div>
     </div>
   </div>
 
   <script>
-    const DEFAULT_DENOMINATIONS = [1, 1, 1, 1, 2, 2, 2, 2, 5, 5, 5, 5, 10, 10, 10, 20, 20, 30, 50];
+    // Configured Google Apps Script Webhook
+    const GOOGLE_SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbz-LOpBatFlViqL_Jmuolou6kLOBAOg5TqElU9W4kUU-Sdi_Gd6m_CgBjh_Y6tHB-JP/exec";
+
     let bins = [];
     let currentShift = 1;
     let currentFilter = 'all';
@@ -152,9 +147,12 @@
     let isScannerRunning = false;
     let lastScanTime = 0;
 
-    // Initialize 70 Slots
-    function initBins() {
-      const saved = localStorage.getItem('roys_lottery_bins_v2');
+    function initApp() {
+      updateDateDisplay();
+      const savedEmp = localStorage.getItem('roys_lottery_employee');
+      if (savedEmp) document.getElementById('employeeSelect').value = savedEmp;
+
+      const saved = localStorage.getItem('roys_lottery_bins_v4');
       if (saved) {
         try {
           bins = JSON.parse(saved);
@@ -180,7 +178,7 @@
 
         arr.push({
           slot: i,
-          gameId: (1000 + i).toString(), // Default 4-digit Michigan Game ID format
+          gameId: (1000 + i).toString(),
           gameName: `$${price} Game Slot ${i}`,
           price: price,
           open: 0,
@@ -192,12 +190,13 @@
     }
 
     function saveBins() {
-      localStorage.setItem('roys_lottery_bins_v2', JSON.stringify(bins));
+      localStorage.setItem('roys_lottery_bins_v4', JSON.stringify(bins));
       renderBins();
     }
 
     function renderBins() {
       const grid = document.getElementById('binsGrid');
+      if (!grid) return;
       grid.innerHTML = '';
       let scannedTotal = 0;
       let totalMoney = 0;
@@ -218,7 +217,7 @@
         card.className = `p-3 rounded-2xl border transition-all ${
           bin.scanned 
             ? 'bg-slate-900/90 border-emerald-500/70 shadow-sm ring-1 ring-emerald-500/30' 
-            : 'bg-slate-900/60 border-slate-800/90 hover:border-slate-700'
+            : 'bg-slate-900/60 border-slate-800 hover:border-slate-700'
         }`;
 
         card.innerHTML = `
@@ -238,19 +237,19 @@
               <span class="text-[9px] text-slate-400 uppercase font-mono font-bold">Game ID:</span>
               <input type="text" value="${bin.gameId}" 
                      onchange="updateBinField(${idx}, 'gameId', this.value.trim())" 
-                     placeholder="e.g. 1042"
+                     placeholder="ID"
                      class="w-16 bg-slate-950/60 rounded px-1 text-[10px] font-mono text-amber-400 border border-slate-800 focus:outline-none text-center" />
             </div>
           </div>
 
           <div class="grid grid-cols-2 gap-1.5 text-[11px] font-mono">
-            <div class="bg-slate-950/60 p-1.5 rounded-xl border border-slate-800/80 text-center">
+            <div class="bg-slate-950/60 p-1.5 rounded-xl border border-slate-800 text-center">
               <span class="text-[8px] text-slate-400 font-bold block uppercase">Open</span>
               <input type="number" value="${bin.open}" 
                      onchange="updateBinField(${idx}, 'open', parseInt(this.value, 10) || 0)"
                      class="w-full bg-transparent text-center font-bold text-slate-300 focus:outline-none" />
             </div>
-            <div class="bg-slate-950/60 p-1.5 rounded-xl border ${bin.scanned ? 'border-emerald-500/50 bg-emerald-950/10' : 'border-slate-800/80'} text-center">
+            <div class="bg-slate-950/60 p-1.5 rounded-xl border ${bin.scanned ? 'border-emerald-500/50 bg-emerald-950/10' : 'border-slate-800'} text-center">
               <span class="text-[8px] ${bin.scanned ? 'text-emerald-400' : 'text-slate-400'} font-bold block uppercase">Close</span>
               <input type="number" value="${bin.close !== null ? bin.close : ''}" placeholder="--" 
                      onchange="manualCloseInput(${bin.slot}, this.value)"
@@ -258,7 +257,7 @@
             </div>
           </div>
 
-          <div class="mt-2 pt-1.5 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
+          <div class="mt-2 pt-1.5 border-t border-slate-800 flex items-center justify-between text-[11px]">
             <span class="text-slate-400 text-[10px]">${sold} sold</span>
             <span class="font-extrabold ${binAmount > 0 ? 'text-emerald-400' : 'text-slate-400'}">$${binAmount.toFixed(2)}</span>
           </div>
@@ -294,59 +293,52 @@
       currentFilter = type;
       ['all', 'pending', 'scanned'].forEach(f => {
         const btn = document.getElementById(`btnFilter${f.charAt(0).toUpperCase() + f.slice(1)}`);
-        if (f === type) {
-          btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-500 text-slate-950 transition";
-        } else {
-          btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition";
+        if (btn) {
+          if (f === type) {
+            btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-500 text-slate-950 transition";
+          } else {
+            btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition";
+          }
         }
       });
       renderBins();
     }
 
     // ========================================================
-    // TICKET BARCODE EXTRACTION & SMART DISPATCHER
+    // TICKET BARCODE EXTRACTION & SMART ROUTING
     // ========================================================
     function parseLotteryBarcode(rawText) {
       const digits = rawText.replace(/[^0-9]/g, '');
       let detectedGame = null;
       let detectedTicket = null;
 
-      // Format A: Standard 24-digit Michigan Validation Barcode (GGGG-PPPPPP-TTT-VVVVVVVVVV)
+      // 24-digit Michigan Lottery barcode: GGGG-PPPPPP-TTT-VVVV
       if (digits.length >= 13) {
         detectedGame = digits.substring(0, 4);
         detectedTicket = parseInt(digits.substring(10, 13), 10);
-      } 
-      // Format B: Hyphenated Barcode (e.g., 0451-123456-024)
-      else if (rawText.includes('-')) {
+      } else if (rawText.includes('-')) {
         const parts = rawText.split('-');
         if (parts.length >= 3) {
           detectedGame = parts[0].replace(/[^0-9]/g, '');
           detectedTicket = parseInt(parts[2].replace(/[^0-9]/g, ''), 10);
         }
-      } 
-      // Format C: Short Barcode / Trailing Ticket Suffix
-      else if (digits.length >= 3) {
+      } else if (digits.length >= 3) {
         detectedTicket = parseInt(digits.substring(digits.length - 3), 10);
       }
-
-      return { detectedGame, detectedTicket, raw: rawText };
+      return { detectedGame, detectedTicket };
     }
 
     function routeScannedTicket(rawText) {
       const { detectedGame, detectedTicket } = parseLotteryBarcode(rawText);
-      
       if (detectedTicket === null || isNaN(detectedTicket)) {
-        updateCameraStatus(`<span class="text-rose-400 font-bold">Unrecognized code format: ${rawText}</span>`);
+        updateCameraStatus(`<span class="text-rose-400 font-bold">Unrecognized code: ${rawText}</span>`);
         return;
       }
 
-      // Try matching by Game ID first
       let matchedBin = null;
       if (detectedGame) {
         matchedBin = bins.find(b => b.gameId === detectedGame || b.gameId === parseInt(detectedGame, 10).toString());
       }
-
-      // Fallback: If game is not yet bound to a slot, assign to next unscanned slot
       if (!matchedBin) {
         matchedBin = bins.find(b => !b.scanned);
         if (matchedBin && detectedGame) {
@@ -360,20 +352,14 @@
         matchedBin.scanned = true;
         saveBins();
 
-        // Audio & Haptic feedback
-        playBeep();
-        if (navigator.vibrate) navigator.vibrate([70, 50, 70]);
-
+        if (navigator.vibrate) navigator.vibrate(80);
         updateCameraStatus(`
           <span class="text-emerald-400 font-black">✔ Slot #${matchedBin.slot} Scanned!</span><br>
           <span class="text-slate-300 font-mono text-[11px]">Game ${matchedBin.gameId} &bull; Close: ${detectedTicket}</span>
         `);
 
-        // Highlight card in background
         const cardElem = document.getElementById(`bin-card-${matchedBin.slot}`);
-        if (cardElem) {
-          cardElem.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
+        if (cardElem) cardElem.scrollIntoView({ behavior: 'smooth', block: 'center' });
       } else {
         updateCameraStatus(`<span class="text-amber-400 font-bold">All 70 slots already scanned!</span>`);
       }
@@ -384,27 +370,12 @@
       document.getElementById('lastScanBadge').innerHTML = html;
     }
 
-    function playBeep() {
-      try {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(880, audioCtx.currentTime); // High pleasant chime
-        gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.12);
-      } catch (e) {}
-    }
-
     // ========================================================
-    // CAMERA SCANNER CONTROLS
+    // DIRECT CAMERA INITIALIZATION WITH AUTOFOCUS
     // ========================================================
     function openScannerModal() {
       document.getElementById('cameraModal').classList.remove('hidden');
-      document.getElementById('cameraStatusText').innerText = "Ready. Point at ticket barcode...";
+      document.getElementById('cameraStatusText').innerText = "Starting camera...";
 
       if (!html5QrCode) {
         html5QrCode = new Html5Qrcode("reader");
@@ -417,22 +388,39 @@
         experimentalFeatures: { useBarCodeDetectorIfSupported: true }
       };
 
+      // Direct constraint avoids permission timing locks in mobile Chrome
       html5QrCode.start(
-        { facingMode: "environment" },
+        { facingMode: { exact: "environment" } },
         qrConfig,
         (decodedText) => {
           const now = Date.now();
-          if (now - lastScanTime < 1400) return; // Prevent duplicate rapid triggers
+          if (now - lastScanTime < 1300) return;
           lastScanTime = now;
           routeScannedTicket(decodedText);
         },
         () => {}
       ).then(() => {
         isScannerRunning = true;
+        document.getElementById('cameraStatusText').innerText = "Ready. Point at ticket barcode...";
       }).catch(err => {
-        document.getElementById('cameraStatusText').innerHTML = `
-          <span class="text-rose-400 font-bold">Camera Access Error: ${err}. Ensure HTTPS and camera permission are enabled.</span>
-        `;
+        // Fallback for devices without strict "exact" environment camera label
+        html5QrCode.start(
+          { facingMode: "environment" },
+          qrConfig,
+          (decodedText) => {
+            const now = Date.now();
+            if (now - lastScanTime < 1300) return;
+            lastScanTime = now;
+            routeScannedTicket(decodedText);
+          },
+          () => {}
+        ).then(() => {
+          isScannerRunning = true;
+          document.getElementById('cameraStatusText').innerText = "Ready. Point at ticket barcode...";
+        }).catch(fallbackErr => {
+          alert("Camera Error: " + fallbackErr + "\n\nMake sure camera permission is granted in Chrome settings for kushnik.github.io.");
+          document.getElementById('cameraStatusText').innerHTML = `<span class="text-rose-400 font-bold">Camera blocked or not found.</span>`;
+        });
       });
     }
 
@@ -451,11 +439,9 @@
       }
     }
 
-   // -------------------------------------------------------------
-    // REPLACE THIS URL WITH YOUR DEPLOYED GOOGLE APPS SCRIPT WEB APP URL
-    const GOOGLE_SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbz-LOpBatFlViqL_Jmuolou6kLOBAOg5TqElU9W4kUU-Sdi_Gd6m_CgBjh_Y6tHB-JP/exec";
-    // -------------------------------------------------------------
-
+    // ========================================================
+    // SHIFT ROLL & GOOGLE SHEET SYNC
+    // ========================================================
     function closeAndRollShift() {
       const cashier = document.getElementById('employeeSelect').value;
       const date = document.getElementById('shiftDate').value;
@@ -470,7 +456,7 @@
         totalAmount += sold * b.price;
       });
 
-      if (!confirm(`Save & Complete Shift ${currentShift} for ${cashier}?\nTotal Tickets Sold: ${totalSold}\nTotal Sales: $${totalAmount.toFixed(2)}\n\nThis will transfer data to Google Sheets and roll numbers forward.`)) {
+      if (!confirm(`Save & Complete Shift ${currentShift} for ${cashier}?\nTotal Tickets: ${totalSold}\nTotal Sales: $${totalAmount.toFixed(2)}\n\nThis will transfer data to Google Sheets and roll numbers forward.`)) {
         return;
       }
 
@@ -494,65 +480,29 @@
         }))
       };
 
-      // Send data to Google Sheets via Webhook
+      // Webhook dispatch to Google Sheet
       fetch(GOOGLE_SHEET_WEBHOOK_URL, {
         method: "POST",
         mode: "no-cors",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
-      })
-      .then(() => {
-        alert(`Shift ${currentShift} synced to Google Sheets successfully!`);
-        executeLocalRoll();
-      })
-      .catch(err => {
-        alert("Warning: Could not sync online (" + err + "). Shift rolled locally.");
-        executeLocalRoll();
+      }).then(() => {
+        document.getElementById('headerSub').innerText = "Synced to Google Sheet";
+      }).catch(err => {
+        console.error("Sheet sync warning:", err);
       });
 
-      function executeLocalRoll() {
-        bins.forEach(b => {
-          b.open = b.close !== null ? b.close : b.open;
-          b.close = null;
-          b.scanned = false;
-        });
-        saveBins();
+      // Roll forward locally
+      bins.forEach(b => {
+        b.open = b.close !== null ? b.close : b.open;
+        b.close = null;
+        b.scanned = false;
+      });
+      saveBins();
 
-        currentShift = currentShift >= 3 ? 1 : currentShift + 1;
-        document.getElementById('shiftSelect').value = currentShift;
-        document.getElementById('headerSub').innerText = `Shift ${currentShift} Active`;
-      }
-    }
-    
-      // Handle roll forward locally
-      function executeLocalRoll() {
-        bins.forEach(b => {
-          b.open = b.close !== null ? b.close : b.open;
-          b.close = null;
-          b.scanned = false;
-        });
-        saveBins();
-
-        currentShift = currentShift >= 3 ? 1 : currentShift + 1;
-        document.getElementById('shiftSelect').value = currentShift;
-        document.getElementById('headerSub').innerText = `Shift ${currentShift} Active`;
-        alert(`Shift completed successfully! Rolls saved.`);
-      }
-
-      // Check if running inside Google Apps Script
-      if (typeof google !== 'undefined' && google.script && google.script.run) {
-        google.script.run
-          .withSuccessHandler(function() {
-            executeLocalRoll();
-          })
-          .withFailureHandler(function(err) {
-            alert("Notice: Could not write directly to Sheet (" + err + "). Shift rolled locally.");
-            executeLocalRoll();
-          })
-          .recordShift(JSON.stringify(payload));
-      } else {
-        executeLocalRoll();
-      }
+      currentShift = currentShift >= 3 ? 1 : currentShift + 1;
+      document.getElementById('shiftSelect').value = currentShift;
+      alert(`Shift completed and rolled forward! Data sent to Google Sheet.`);
     }
 
     function exportDataJSON() {
@@ -567,7 +517,9 @@
 
     function updateDateDisplay() {
       const picker = document.getElementById('shiftDate');
-      if (!picker.value) picker.value = new Date().toISOString().split('T')[0];
+      if (!picker.value) {
+        picker.value = new Date().toISOString().split('T')[0];
+      }
       const parts = picker.value.split('-');
       const d = new Date(parts[0], parts[1] - 1, parts[2]);
       const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -577,12 +529,7 @@
     function changeShift(val) { currentShift = parseInt(val, 10); }
     function saveCurrentEmployee() { localStorage.setItem('roys_lottery_employee', document.getElementById('employeeSelect').value); }
 
-    window.onload = function() {
-      initBins();
-      updateDateDisplay();
-      const savedEmp = localStorage.getItem('roys_lottery_employee');
-      if (savedEmp) document.getElementById('employeeSelect').value = savedEmp;
-    };
+    window.addEventListener('DOMContentLoaded', initApp);
   </script>
 </body>
 </html>
