@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Roy's Instant Lottery Shift Tracker</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Fast, robust barcode scanner build -->
   <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <style>
     body { background-color: #0b0f17; color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -17,14 +16,14 @@
     .scanner-laser {
       position: absolute; left: 6%; width: 88%; height: 2px;
       background: #10b981; box-shadow: 0 0 14px 2px #10b981;
-      animation: scanline 1.6s infinite ease-in-out;
+      animation: scanline 1.5s infinite ease-in-out;
     }
     #reader video { object-fit: cover !important; border-radius: 1.25rem; width: 100% !important; height: 100% !important; }
   </style>
 </head>
 <body class="min-h-screen flex flex-col pb-28">
 
-  <!-- Sticky Top Header -->
+  <!-- Top Sticky Header -->
   <header class="sticky top-0 z-30 bg-slate-900/95 backdrop-blur border-b border-slate-800 px-4 py-3 shadow">
     <div class="max-w-5xl mx-auto flex items-center justify-between gap-2">
       <div>
@@ -113,22 +112,22 @@
       <div class="p-3 bg-slate-850 border-b border-slate-800 flex items-center justify-between">
         <div class="flex items-center gap-2">
           <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span class="text-xs font-extrabold text-white tracking-wide uppercase">Scan Instant Ticket</span>
+          <span class="text-xs font-extrabold text-white tracking-wide uppercase">Scan Bottom Barcode</span>
         </div>
         <button onclick="closeScannerModal()" class="text-slate-400 hover:text-white text-lg font-bold px-2 py-1">&times;</button>
       </div>
 
-      <div class="relative w-full h-72 bg-black flex items-center justify-center overflow-hidden">
+      <div class="relative w-full h-64 bg-black flex items-center justify-center overflow-hidden">
         <div id="reader" class="w-full h-full"></div>
-        <div class="absolute w-56 h-36 border-2 border-emerald-400/80 rounded-2xl pointer-events-none flex flex-col items-center justify-between p-2">
-          <span class="text-[9px] text-emerald-300 font-mono bg-black/70 px-2 py-0.5 rounded-full">ALIGN BARCODE</span>
+        <div class="absolute w-60 h-24 border-2 border-emerald-400 rounded-xl pointer-events-none flex flex-col items-center justify-between p-1.5">
+          <span class="text-[9px] text-emerald-300 font-mono bg-black/80 px-2 py-0.5 rounded">ALIGN BOTTOM BARCODE</span>
           <div class="scanner-laser"></div>
-          <span class="text-[9px] text-slate-300 font-mono bg-black/70 px-2 py-0.5 rounded-full">TICKET FRONT</span>
+          <span class="text-[8px] text-amber-300 font-mono bg-black/80 px-2 py-0.5 rounded">IGNORE VERTICAL UPC</span>
         </div>
       </div>
 
       <div class="p-3 bg-slate-900 border-t border-slate-800 text-center">
-        <p id="cameraStatusText" class="text-xs text-slate-300 font-medium">Point camera at ticket validation barcode.</p>
+        <p id="cameraStatusText" class="text-xs text-slate-300 font-medium">Point at the horizontal barcode at the bottom of the ticket.</p>
         <button onclick="closeScannerModal()" class="mt-3 w-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold py-2.5 rounded-xl border border-slate-700">
           Close Scanner
         </button>
@@ -137,7 +136,6 @@
   </div>
 
   <script>
-    // Configured Google Apps Script Webhook
     const GOOGLE_SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbz-LOpBatFlViqL_Jmuolou6kLOBAOg5TqElU9W4kUU-Sdi_Gd6m_CgBjh_Y6tHB-JP/exec";
 
     let bins = [];
@@ -145,14 +143,25 @@
     let currentFilter = 'all';
     let html5QrCode = null;
     let isScannerRunning = false;
-    let lastScanTime = 0;
+    let isProcessingScan = false;
+    let audioCtx = null;
+
+    // Initialize global audio context on first user tap (required by mobile Chrome/Safari)
+    function unlockAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
 
     function initApp() {
       updateDateDisplay();
       const savedEmp = localStorage.getItem('roys_lottery_employee');
       if (savedEmp) document.getElementById('employeeSelect').value = savedEmp;
 
-      const saved = localStorage.getItem('roys_lottery_bins_v4');
+      const saved = localStorage.getItem('roys_lottery_bins_v6');
       if (saved) {
         try {
           bins = JSON.parse(saved);
@@ -178,8 +187,8 @@
 
         arr.push({
           slot: i,
-          gameId: (1000 + i).toString(),
-          gameName: `$${price} Game Slot ${i}`,
+          gameId: "",
+          gameName: `Slot #${i} ($${price})`,
           price: price,
           open: 0,
           close: null,
@@ -190,7 +199,7 @@
     }
 
     function saveBins() {
-      localStorage.setItem('roys_lottery_bins_v4', JSON.stringify(bins));
+      localStorage.setItem('roys_lottery_bins_v6', JSON.stringify(bins));
       renderBins();
     }
 
@@ -234,10 +243,10 @@
                    onchange="updateBinField(${idx}, 'gameName', this.value)"
                    class="w-full bg-transparent border-b border-transparent hover:border-slate-700 focus:border-slate-500 text-[11px] text-slate-200 font-semibold focus:outline-none truncate" />
             <div class="flex items-center gap-1">
-              <span class="text-[9px] text-slate-400 uppercase font-mono font-bold">Game ID:</span>
+              <span class="text-[9px] text-slate-400 uppercase font-mono font-bold">Game:</span>
               <input type="text" value="${bin.gameId}" 
+                     placeholder="e.g. 0755"
                      onchange="updateBinField(${idx}, 'gameId', this.value.trim())" 
-                     placeholder="ID"
                      class="w-16 bg-slate-950/60 rounded px-1 text-[10px] font-mono text-amber-400 border border-slate-800 focus:outline-none text-center" />
             </div>
           </div>
@@ -305,64 +314,116 @@
     }
 
     // ========================================================
-    // TICKET BARCODE EXTRACTION & SMART ROUTING
+    // RIGID LOTTERY BARCODE PARSER
     // ========================================================
-    function parseLotteryBarcode(rawText) {
-      const digits = rawText.replace(/[^0-9]/g, '');
-      let detectedGame = null;
-      let detectedTicket = null;
+    function parseMichiganLotteryBarcode(raw) {
+      const text = raw.trim();
 
-      // 24-digit Michigan Lottery barcode: GGGG-PPPPPP-TTT-VVVV
-      if (digits.length >= 13) {
-        detectedGame = digits.substring(0, 4);
-        detectedTicket = parseInt(digits.substring(10, 13), 10);
-      } else if (rawText.includes('-')) {
-        const parts = rawText.split('-');
-        if (parts.length >= 3) {
-          detectedGame = parts[0].replace(/[^0-9]/g, '');
-          detectedTicket = parseInt(parts[2].replace(/[^0-9]/g, ''), 10);
-        }
-      } else if (digits.length >= 3) {
-        detectedTicket = parseInt(digits.substring(digits.length - 3), 10);
+      // Reject retail UPC barcode
+      if (text.startsWith("044684") || text.startsWith("44684")) {
+        return { error: "UPC ignored. Scan bottom horizontal barcode." };
       }
-      return { detectedGame, detectedTicket };
+
+      // Format with hyphens: 0755-082336-001
+      if (text.includes("-")) {
+        const parts = text.split("-");
+        if (parts.length >= 3) {
+          const gameId = parts[0].padStart(4, '0');
+          const packNum = parts[1];
+          const ticketNum = parseInt(parts[2], 10);
+          return { gameId, packNum, ticketNum };
+        }
+      }
+
+      // Numeric raw 13 or 14 digits
+      const clean = text.replace(/[^0-9]/g, '');
+      if (clean.length === 13 || clean.length === 14) {
+        const gameId = clean.length === 14 ? clean.substring(0, 4) : clean.substring(0, 3).padStart(4, '0');
+        const packStart = clean.length === 14 ? 4 : 3;
+        const packNum = clean.substring(packStart, packStart + 6);
+        const ticketNum = parseInt(clean.substring(packStart + 6, packStart + 9), 10);
+        return { gameId, packNum, ticketNum };
+      }
+
+      return { error: "Invalid inventory barcode format." };
     }
 
+    // ========================================================
+    // SCAN ROUTER WITH GAME DEDUPLICATION SAFEGUARD
+    // ========================================================
     function routeScannedTicket(rawText) {
-      const { detectedGame, detectedTicket } = parseLotteryBarcode(rawText);
-      if (detectedTicket === null || isNaN(detectedTicket)) {
-        updateCameraStatus(`<span class="text-rose-400 font-bold">Unrecognized code: ${rawText}</span>`);
+      if (isProcessingScan) return;
+
+      const parsed = parseMichiganLotteryBarcode(rawText);
+      if (parsed.error) {
+        updateCameraStatus(`<span class="text-amber-400 font-bold">${parsed.error}</span>`);
         return;
       }
 
-      let matchedBin = null;
-      if (detectedGame) {
-        matchedBin = bins.find(b => b.gameId === detectedGame || b.gameId === parseInt(detectedGame, 10).toString());
+      isProcessingScan = true;
+
+      // Check if this Game ID has ALREADY been scanned and completed this shift
+      const alreadyScannedBin = bins.find(b => 
+        (b.gameId === parsed.gameId || parseInt(b.gameId, 10) === parseInt(parsed.gameId, 10)) && b.scanned
+      );
+
+      if (alreadyScannedBin) {
+        // REJECT DUPLICATE GAME SCAN WITH LOW BUZZ
+        playWarningBuzz();
+        if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+        updateCameraStatus(`
+          <span class="text-amber-400 font-bold">⚠️ Game #${parsed.gameId} already logged!</span><br>
+          <span class="text-slate-400 text-[11px]">Recorded in Slot #${alreadyScannedBin.slot} (Ticket #${alreadyScannedBin.close})</span>
+        `);
+
+        setTimeout(() => {
+          isProcessingScan = false;
+        }, 2000);
+        return;
       }
-      if (!matchedBin) {
-        matchedBin = bins.find(b => !b.scanned);
-        if (matchedBin && detectedGame) {
-          matchedBin.gameId = detectedGame;
-          matchedBin.gameName = `$${matchedBin.price} Game (${detectedGame})`;
+
+      // Find an unscanned slot that matches this Game ID
+      let targetBin = bins.find(b => 
+        (b.gameId === parsed.gameId || parseInt(b.gameId, 10) === parseInt(parsed.gameId, 10)) && !b.scanned
+      );
+
+      // If game ID is new/unassigned, bind to first available unscanned slot without a game ID
+      if (!targetBin) {
+        targetBin = bins.find(b => !b.scanned && (!b.gameId || b.gameId === ""));
+        if (!targetBin) {
+          targetBin = bins.find(b => !b.scanned);
+        }
+        if (targetBin) {
+          targetBin.gameId = parsed.gameId;
+          targetBin.gameName = `Game #${parsed.gameId}`;
         }
       }
 
-      if (matchedBin) {
-        matchedBin.close = detectedTicket;
-        matchedBin.scanned = true;
+      if (targetBin) {
+        targetBin.close = parsed.ticketNum;
+        targetBin.scanned = true;
         saveBins();
 
-        if (navigator.vibrate) navigator.vibrate(80);
+        // PLAY CLEAR SUCCESS CHIME & VIBRATE
+        playSuccessChime();
+        if (navigator.vibrate) navigator.vibrate(120);
+
         updateCameraStatus(`
-          <span class="text-emerald-400 font-black">✔ Slot #${matchedBin.slot} Scanned!</span><br>
-          <span class="text-slate-300 font-mono text-[11px]">Game ${matchedBin.gameId} &bull; Close: ${detectedTicket}</span>
+          <span class="text-emerald-400 font-black text-sm">✔ Slot #${targetBin.slot} Logged!</span><br>
+          <span class="text-slate-300 font-mono text-[11px]">Game ${parsed.gameId} &bull; Close: #${parsed.ticketNum}</span>
         `);
 
-        const cardElem = document.getElementById(`bin-card-${matchedBin.slot}`);
-        if (cardElem) cardElem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const card = document.getElementById(`bin-card-${targetBin.slot}`);
+        if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
       } else {
-        updateCameraStatus(`<span class="text-amber-400 font-bold">All 70 slots already scanned!</span>`);
+        updateCameraStatus(`<span class="text-amber-400 font-bold">All 70 slots are already completed!</span>`);
       }
+
+      // 2.5 second cooldown to give cashier time to advance to next slot
+      setTimeout(() => {
+        isProcessingScan = false;
+        document.getElementById('cameraStatusText').innerText = "Ready for next ticket...";
+      }, 2500);
     }
 
     function updateCameraStatus(html) {
@@ -371,56 +432,96 @@
     }
 
     // ========================================================
-    // DIRECT CAMERA INITIALIZATION WITH AUTOFOCUS
+    // DUAL-TONE AUDIO CHIME (High Pleasant POS Register Ding)
+    // ========================================================
+    function playSuccessChime() {
+      try {
+        unlockAudio();
+        const now = audioCtx.currentTime;
+
+        // Note 1: 987.77 Hz (B5)
+        const osc1 = audioCtx.createOscillator();
+        const gain1 = audioCtx.createGain();
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(987.77, now);
+        gain1.gain.setValueAtTime(0.25, now);
+        gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+        osc1.connect(gain1);
+        gain1.connect(audioCtx.destination);
+        osc1.start(now);
+        osc1.stop(now + 0.12);
+
+        // Note 2: 1760 Hz (A6 - High Chime)
+        const osc2 = audioCtx.createOscillator();
+        const gain2 = audioCtx.createGain();
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(1760, now + 0.08);
+        gain2.gain.setValueAtTime(0.3, now + 0.08);
+        gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+        osc2.connect(gain2);
+        gain2.connect(audioCtx.destination);
+        osc2.start(now + 0.08);
+        osc2.stop(now + 0.35);
+      } catch (e) {
+        console.warn("Audio chime prevented by browser:", e);
+      }
+    }
+
+    // Warning Buzz if the same game was already scanned
+    function playWarningBuzz() {
+      try {
+        unlockAudio();
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(220, now); // Low warning note
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.25);
+      } catch (e) {}
+    }
+
+    // ========================================================
+    // CAMERA ENGINE
     // ========================================================
     function openScannerModal() {
+      unlockAudio(); // Unlock Web Audio context on user tap
       document.getElementById('cameraModal').classList.remove('hidden');
       document.getElementById('cameraStatusText').innerText = "Starting camera...";
+      isProcessingScan = false;
 
       if (!html5QrCode) {
         html5QrCode = new Html5Qrcode("reader");
       }
 
       const qrConfig = {
-        fps: 20,
-        qrbox: { width: 260, height: 140 },
+        fps: 15,
+        qrbox: { width: 280, height: 110 },
         aspectRatio: 1.0,
-        experimentalFeatures: { useBarCodeDetectorIfSupported: true }
+        formatsToSupport: [
+          Html5QrcodeSupportedFormats.CODE_128,
+          Html5QrcodeSupportedFormats.ITF,
+          Html5QrcodeSupportedFormats.CODE_39
+        ]
       };
 
-      // Direct constraint avoids permission timing locks in mobile Chrome
       html5QrCode.start(
-        { facingMode: { exact: "environment" } },
+        { facingMode: "environment" },
         qrConfig,
         (decodedText) => {
-          const now = Date.now();
-          if (now - lastScanTime < 1300) return;
-          lastScanTime = now;
           routeScannedTicket(decodedText);
         },
         () => {}
       ).then(() => {
         isScannerRunning = true;
-        document.getElementById('cameraStatusText').innerText = "Ready. Point at ticket barcode...";
+        document.getElementById('cameraStatusText').innerText = "Align bottom horizontal barcode inside green box.";
       }).catch(err => {
-        // Fallback for devices without strict "exact" environment camera label
-        html5QrCode.start(
-          { facingMode: "environment" },
-          qrConfig,
-          (decodedText) => {
-            const now = Date.now();
-            if (now - lastScanTime < 1300) return;
-            lastScanTime = now;
-            routeScannedTicket(decodedText);
-          },
-          () => {}
-        ).then(() => {
-          isScannerRunning = true;
-          document.getElementById('cameraStatusText').innerText = "Ready. Point at ticket barcode...";
-        }).catch(fallbackErr => {
-          alert("Camera Error: " + fallbackErr + "\n\nMake sure camera permission is granted in Chrome settings for kushnik.github.io.");
-          document.getElementById('cameraStatusText').innerHTML = `<span class="text-rose-400 font-bold">Camera blocked or not found.</span>`;
-        });
+        alert("Camera Error: " + err);
+        document.getElementById('cameraStatusText').innerHTML = `<span class="text-rose-400 font-bold">Camera blocked. Check permissions.</span>`;
       });
     }
 
@@ -456,7 +557,7 @@
         totalAmount += sold * b.price;
       });
 
-      if (!confirm(`Save & Complete Shift ${currentShift} for ${cashier}?\nTotal Tickets: ${totalSold}\nTotal Sales: $${totalAmount.toFixed(2)}\n\nThis will transfer data to Google Sheets and roll numbers forward.`)) {
+      if (!confirm(`Save Shift ${currentShift} for ${cashier}?\nTotal Sold: ${totalSold} tickets\nTotal Sales: $${totalAmount.toFixed(2)}\n\nThis will send records to your Google Sheet and roll closing numbers forward.`)) {
         return;
       }
 
@@ -480,7 +581,6 @@
         }))
       };
 
-      // Webhook dispatch to Google Sheet
       fetch(GOOGLE_SHEET_WEBHOOK_URL, {
         method: "POST",
         mode: "no-cors",
@@ -489,7 +589,7 @@
       }).then(() => {
         document.getElementById('headerSub').innerText = "Synced to Google Sheet";
       }).catch(err => {
-        console.error("Sheet sync warning:", err);
+        console.error("Sheet Sync Warning:", err);
       });
 
       // Roll forward locally
@@ -502,7 +602,7 @@
 
       currentShift = currentShift >= 3 ? 1 : currentShift + 1;
       document.getElementById('shiftSelect').value = currentShift;
-      alert(`Shift completed and rolled forward! Data sent to Google Sheet.`);
+      alert(`Shift completed! Data transmitted to Google Sheet.`);
     }
 
     function exportDataJSON() {
@@ -517,9 +617,7 @@
 
     function updateDateDisplay() {
       const picker = document.getElementById('shiftDate');
-      if (!picker.value) {
-        picker.value = new Date().toISOString().split('T')[0];
-      }
+      if (!picker.value) picker.value = new Date().toISOString().split('T')[0];
       const parts = picker.value.split('-');
       const d = new Date(parts[0], parts[1] - 1, parts[2]);
       const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
