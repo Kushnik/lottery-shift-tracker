@@ -6,43 +6,43 @@
   <title>Roy's Instant Lottery Shift Tracker</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body { background-color: #f1f5f9; color: #0f172a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background-color: #e2e8f0; color: #0f172a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
   </style>
 </head>
 <body class="min-h-screen flex flex-col pb-80">
 
-  <!-- Top Sticky Header -->
-  <header class="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-slate-200 px-4 py-3 shadow-sm">
+  <!-- 1. Top Brand Header (Deep Navy Anchor) -->
+  <header class="sticky top-0 z-30 bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white border-b border-blue-900 px-4 py-3 shadow-md">
     <div class="max-w-5xl mx-auto flex items-center justify-between gap-2">
       <div>
-        <h1 class="text-base font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
-          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+        <h1 class="text-base font-extrabold text-white tracking-tight flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
           Roy's Instant Lottery
         </h1>
-        <p id="headerSub" class="text-[11px] text-slate-500 font-semibold">62-Slot Continuous Shift Tracker</p>
+        <p id="headerSub" class="text-[11px] text-blue-200 font-semibold">62-Slot Continuous Shift Tracker</p>
       </div>
       <div class="flex items-center gap-1.5">
-        <button onclick="toggleHelpGuide()" id="btnToggleHelp" class="bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-300 font-bold px-3 py-2 rounded-xl text-xs shadow-sm active:scale-95 transition">
+        <button onclick="toggleHelpGuide()" id="btnToggleHelp" class="bg-blue-800/80 hover:bg-blue-700 text-blue-100 border border-blue-600 font-bold px-3 py-2 rounded-xl text-xs shadow-sm active:scale-95 transition">
           How to Use
         </button>
-        <button onclick="toggleKeypad()" id="btnToggleKeypad" class="bg-slate-900 hover:bg-slate-800 text-white font-bold px-3.5 py-2 rounded-xl text-xs shadow-sm active:scale-95 transition">
+        <button onclick="toggleKeypad()" id="btnToggleKeypad" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black px-3.5 py-2 rounded-xl text-xs shadow-sm active:scale-95 transition">
           10-Key Pad
         </button>
       </div>
     </div>
   </header>
 
-  <!-- Controls & Stats Panel -->
-  <main class="max-w-5xl w-full mx-auto px-4 mt-3 space-y-3 flex-1">
+  <!-- Main Workspace -->
+  <main class="max-w-5xl w-full mx-auto px-3.5 mt-3 space-y-3 flex-1">
 
     <!-- Collapsible Employee Quick-Start Guide -->
-    <div id="helpGuideBanner" class="bg-sky-50/90 border border-sky-200 rounded-2xl p-3.5 shadow-sm text-xs text-slate-800">
+    <div id="helpGuideBanner" class="bg-amber-50 border-2 border-amber-300 rounded-2xl p-3.5 shadow-sm text-xs text-slate-800">
       <div class="flex items-center justify-between mb-2">
         <div class="flex items-center gap-2">
-          <span class="bg-sky-600 text-white font-black text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-md">Employee Guide</span>
+          <span class="bg-amber-500 text-slate-950 font-black text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-md">Employee Guide</span>
           <h2 class="font-extrabold text-slate-900 text-sm">How to Use This Shift Tracker</h2>
         </div>
-        <button onclick="toggleHelpGuide()" class="text-sky-700 hover:text-sky-950 font-bold text-xs underline">Hide</button>
+        <button onclick="toggleHelpGuide()" class="text-amber-800 hover:text-amber-950 font-bold text-xs underline">Hide</button>
       </div>
       <ol class="list-decimal list-inside space-y-1.5 text-slate-700 leading-relaxed">
         <li><strong>Check Shift Info:</strong> Confirm the <strong>Date</strong>, <strong>Shift</strong> (1, 2, or 3), and your <strong>Cashier Name</strong> before starting.</li>
@@ -58,24 +58,24 @@
       </ol>
     </div>
     
-    <!-- Shift Meta Header -->
-    <div class="bg-white border border-slate-200 rounded-2xl p-3.5 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs shadow-sm">
+    <!-- 2. Shift Meta Card (Soft Blue-Tinted Zone) -->
+    <div class="bg-blue-50/90 border-2 border-blue-200 rounded-2xl p-3.5 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs shadow-sm">
       <div>
-        <label class="block text-slate-500 text-[10px] uppercase font-extrabold tracking-wider mb-1">Date</label>
-        <input type="date" id="shiftDate" onchange="updateDateDisplay()" class="w-full bg-slate-50 border border-slate-300 text-slate-900 rounded-xl p-2 font-bold focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-        <span id="dayLabel" class="text-[11px] text-emerald-600 font-extrabold mt-1 block"></span>
+        <label class="block text-blue-900 text-[10px] uppercase font-extrabold tracking-wider mb-1">Date</label>
+        <input type="date" id="shiftDate" onchange="updateDateDisplay()" class="w-full bg-white border border-blue-300 text-slate-900 rounded-xl p-2 font-bold focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        <span id="dayLabel" class="text-[11px] text-blue-700 font-extrabold mt-1 block"></span>
       </div>
       <div>
-        <label class="block text-slate-500 text-[10px] uppercase font-extrabold tracking-wider mb-1">Shift</label>
-        <select id="shiftSelect" onchange="changeShift(this.value)" class="w-full bg-slate-50 border border-slate-300 text-slate-900 rounded-xl p-2 font-bold focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+        <label class="block text-blue-900 text-[10px] uppercase font-extrabold tracking-wider mb-1">Shift</label>
+        <select id="shiftSelect" onchange="changeShift(this.value)" class="w-full bg-white border border-blue-300 text-slate-900 rounded-xl p-2 font-bold focus:ring-2 focus:ring-blue-500 focus:outline-none">
           <option value="1">Shift 1 (Day / Open)</option>
           <option value="2">Shift 2 (Mid / Close)</option>
           <option value="3">Shift 3 (Night)</option>
         </select>
       </div>
       <div>
-        <label class="block text-slate-500 text-[10px] uppercase font-extrabold tracking-wider mb-1">Cashier</label>
-        <select id="employeeSelect" onchange="saveCurrentEmployee()" class="w-full bg-slate-50 border border-slate-300 text-slate-900 rounded-xl p-2 font-bold focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+        <label class="block text-blue-900 text-[10px] uppercase font-extrabold tracking-wider mb-1">Cashier</label>
+        <select id="employeeSelect" onchange="saveCurrentEmployee()" class="w-full bg-white border border-blue-300 text-slate-900 rounded-xl p-2 font-bold focus:ring-2 focus:ring-blue-500 focus:outline-none">
           <option value="Lynn Shene">Lynn Shene (Manager)</option>
           <option value="Shannon">Shannon</option>
           <option value="Jeckie">Jeckie</option>
@@ -83,103 +83,103 @@
         </select>
       </div>
       <div>
-        <label class="block text-slate-500 text-[10px] uppercase font-extrabold tracking-wider mb-1">Progress</label>
-        <div class="bg-slate-50 border border-slate-300 rounded-xl p-2 text-center">
-          <span id="scannedCount" class="font-black text-emerald-600 text-sm">0 / 62</span>
-          <span class="text-[10px] text-slate-500 block font-semibold">Slots Checked</span>
+        <label class="block text-blue-900 text-[10px] uppercase font-extrabold tracking-wider mb-1">Progress</label>
+        <div class="bg-white border border-blue-300 rounded-xl p-2 text-center shadow-inner">
+          <span id="scannedCount" class="font-black text-blue-700 text-sm">0 / 62</span>
+          <span class="text-[10px] text-slate-500 block font-bold">Slots Checked</span>
         </div>
       </div>
     </div>
 
-    <!-- Financial Card Banner -->
-    <div class="bg-white border border-slate-200 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3 shadow-sm">
+    <!-- 3. Financial Sales Card (Bold Emerald Banner) -->
+    <div class="bg-gradient-to-r from-emerald-600 to-teal-700 text-white rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3 shadow-md border border-emerald-500">
       <div>
-        <p class="text-[10px] text-slate-500 font-extrabold uppercase tracking-widest">Calculated Shift Sales</p>
-        <p id="shiftTotalMoney" class="text-3xl sm:text-4xl font-black text-emerald-600 tracking-tight">$0.00</p>
-        <p id="shiftTotalTickets" class="text-xs text-slate-600 font-semibold mt-0.5">0 tickets sold across 62 slots</p>
+        <p class="text-[10px] text-emerald-100 font-extrabold uppercase tracking-widest">Calculated Shift Sales</p>
+        <p id="shiftTotalMoney" class="text-3xl sm:text-4xl font-black text-white tracking-tight">$0.00</p>
+        <p id="shiftTotalTickets" class="text-xs text-emerald-100 font-semibold mt-0.5">0 tickets sold across 62 slots</p>
       </div>
       <div class="flex items-center gap-2">
-        <button onclick="exportDataJSON()" title="Download Backup JSON" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold p-3 rounded-xl border border-slate-300 text-xs transition">
+        <button onclick="exportDataJSON()" title="Download Backup JSON" class="bg-emerald-800/70 hover:bg-emerald-800 text-white font-bold p-3 rounded-xl border border-emerald-400/40 text-xs transition shadow-sm">
           &#128190;
         </button>
-        <button onclick="closeAndRollShift()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-black px-4 py-3 rounded-xl text-xs active:scale-95 transition shadow-md shadow-emerald-600/20 text-center">
-          Save Shift &<br><span class="text-emerald-100">Roll Forward</span>
+        <button onclick="closeAndRollShift()" class="bg-white hover:bg-emerald-50 text-emerald-900 font-black px-4 py-3 rounded-xl text-xs active:scale-95 transition shadow-md text-center">
+          Save Shift &<br><span class="text-emerald-700 font-extrabold">Roll Forward</span>
         </button>
       </div>
     </div>
 
-    <!-- Filter Pills -->
+    <!-- 4. Filter Bar -->
     <div class="flex items-center justify-between pt-1">
-      <div class="flex gap-1.5 bg-white p-1 rounded-xl border border-slate-200 shadow-sm">
-        <button onclick="setFilter('all')" id="btnFilterAll" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-900 text-white transition">All (62)</button>
-        <button onclick="setFilter('pending')" id="btnFilterPending" class="px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition">Pending</button>
-        <button onclick="setFilter('scanned')" id="btnFilterScanned" class="px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition">Checked</button>
+      <div class="flex gap-1.5 bg-slate-300/80 p-1 rounded-xl border border-slate-300">
+        <button onclick="setFilter('all')" id="btnFilterAll" class="px-3.5 py-1.5 rounded-lg text-xs font-extrabold bg-slate-900 text-white shadow-sm transition">All (62)</button>
+        <button onclick="setFilter('pending')" id="btnFilterPending" class="px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-700 hover:text-slate-950 transition">Pending</button>
+        <button onclick="setFilter('scanned')" id="btnFilterScanned" class="px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-700 hover:text-slate-950 transition">Checked</button>
       </div>
-      <span id="lastScanBadge" class="text-[11px] font-medium text-slate-500 hidden sm:inline">Tap any slot to enter Close #</span>
+      <span id="lastScanBadge" class="text-[11px] font-bold text-slate-600 hidden sm:inline">Tap any slot to enter Close #</span>
     </div>
 
-    <!-- 62 Bins Grid -->
+    <!-- 5. 62 Lottery Slot Cards -->
     <div id="binsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5 pt-1"></div>
   </main>
 
-  <!-- Rapid 10-Key Auto-Advance Bottom Keypad -->
-  <div id="rapidKeypadDrawer" class="fixed bottom-0 inset-x-0 z-40 bg-white/98 backdrop-blur-lg border-t-2 border-slate-300 shadow-[0_-8px_25px_-5px_rgba(0,0,0,0.12)] transition-transform duration-200">
-    <div class="max-w-lg mx-auto p-3 space-y-2">
+  <!-- 6. Rapid 10-Key Auto-Advance Bottom Keypad (High-Contrast Multi-Zone Design) -->
+  <div id="rapidKeypadDrawer" class="fixed bottom-0 inset-x-0 z-40 bg-slate-300 border-t-2 border-slate-400 shadow-[0_-10px_30px_-5px_rgba(15,23,42,0.25)] transition-transform duration-200">
+    <div class="max-w-lg mx-auto p-2.5 space-y-2">
       
-      <!-- Enlarged Active Slot & Dollar Amount Banner -->
-      <div class="flex items-center justify-between bg-slate-100 border border-slate-300 rounded-2xl px-3 py-2">
+      <!-- Dark Navy Active Slot Status Bar (Distinct from keypad buttons below) -->
+      <div class="flex items-center justify-between bg-slate-900 text-white border border-slate-700 rounded-2xl px-3 py-2 shadow-md">
         <div class="flex items-center gap-2">
-          <button onclick="moveActiveSlot(-1)" class="bg-white hover:bg-slate-200 active:bg-slate-300 text-slate-800 border border-slate-300 font-black px-3 py-2 rounded-xl text-sm shadow-sm">&larr;</button>
+          <button onclick="moveActiveSlot(-1)" class="bg-slate-700 hover:bg-slate-600 active:bg-slate-500 text-white border border-slate-600 font-black px-3 py-2 rounded-xl text-sm shadow-sm">&larr;</button>
           <div>
             <div class="flex items-center gap-1.5">
-              <span id="kpSlotLabel" class="text-lg font-black text-slate-900 tracking-tight">SLOT #1</span>
-              <span id="kpPriceBadge" class="text-xs font-black px-2.5 py-0.5 rounded-lg border shadow-sm">$1</span>
+              <span id="kpSlotLabel" class="text-lg font-black text-amber-400 tracking-tight">SLOT #1</span>
+              <span id="kpPriceBadge" class="text-xs font-black px-2.5 py-0.5 rounded-lg border shadow-sm">$1 Ticket</span>
             </div>
-            <span id="kpOpenLabel" class="text-xs font-mono font-bold text-slate-600 block mt-0.5">Open: --</span>
+            <span id="kpOpenLabel" class="text-xs font-mono font-bold text-slate-300 block mt-0.5">Open: --</span>
           </div>
-          <button onclick="moveActiveSlot(1)" class="bg-white hover:bg-slate-200 active:bg-slate-300 text-slate-800 border border-slate-300 font-black px-3 py-2 rounded-xl text-sm shadow-sm">&rarr;</button>
+          <button onclick="moveActiveSlot(1)" class="bg-slate-700 hover:bg-slate-600 active:bg-slate-500 text-white border border-slate-600 font-black px-3 py-2 rounded-xl text-sm shadow-sm">&rarr;</button>
         </div>
 
         <div class="flex items-center gap-2">
-          <div class="bg-white border-2 border-emerald-500 rounded-xl px-2.5 py-1.5 min-w-[88px] text-center shadow-sm">
+          <div class="bg-white border-2 border-emerald-400 rounded-xl px-2.5 py-1 min-w-[88px] text-center shadow-inner">
             <span class="text-[9px] text-slate-500 font-extrabold uppercase block leading-none">Close #</span>
-            <span id="kpDisplay" class="text-xl font-mono font-black text-emerald-600 leading-tight">--</span>
+            <span id="kpDisplay" class="text-xl font-mono font-black text-emerald-700 leading-tight">--</span>
           </div>
-          <button onclick="toggleKeypad()" class="text-slate-500 hover:text-slate-900 text-xs font-bold px-1.5 py-1">Hide</button>
+          <button onclick="toggleKeypad()" class="text-slate-300 hover:text-white text-xs font-bold px-1.5 py-1">Hide</button>
         </div>
       </div>
 
-      <!-- Empty / Sold-Out Action Row -->
+      <!-- Color-Coded Empty / Sold-Out Action Buttons -->
       <div class="grid grid-cols-2 gap-1.5">
-        <button onclick="markBinEmptySkip()" class="bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 border border-slate-300 font-extrabold py-2.5 rounded-xl text-[11px] transition">
+        <button onclick="markBinEmptySkip()" class="bg-sky-600 hover:bg-sky-500 active:bg-sky-700 text-white border border-sky-700 font-extrabold py-2.5 rounded-xl text-[11px] shadow-sm transition">
           EMPTY BIN (0 Sold / Skip)
         </button>
-        <button onclick="markBinSoldOut()" class="bg-amber-100 hover:bg-amber-200 active:bg-amber-300 text-amber-900 border border-amber-400 font-extrabold py-2.5 rounded-xl text-[11px] transition">
+        <button onclick="markBinSoldOut()" class="bg-amber-400 hover:bg-amber-300 active:bg-amber-500 text-slate-950 border border-amber-500 font-black py-2.5 rounded-xl text-[11px] shadow-sm transition">
           PACK SOLD OUT (Through 000)
         </button>
       </div>
 
-      <!-- 10-Key Numeric Pad -->
+      <!-- Crisp White 10-Key Numeric Pad on Cool Slate Tray -->
       <div class="grid grid-cols-4 gap-1.5 font-mono">
-        <button onclick="kpPress('1')" class="bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-900 border border-slate-300 font-extrabold text-xl py-2.5 rounded-xl shadow-sm">1</button>
-        <button onclick="kpPress('2')" class="bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-900 border border-slate-300 font-extrabold text-xl py-2.5 rounded-xl shadow-sm">2</button>
-        <button onclick="kpPress('3')" class="bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-900 border border-slate-300 font-extrabold text-xl py-2.5 rounded-xl shadow-sm">3</button>
-        <button onclick="kpBackspace()" class="bg-rose-100 hover:bg-rose-200 active:bg-rose-300 text-rose-800 border border-rose-300 font-extrabold text-sm py-2.5 rounded-xl">DEL</button>
+        <button onclick="kpPress('1')" class="bg-white hover:bg-slate-50 active:bg-slate-200 text-slate-900 border-b-2 border-slate-400 font-black text-xl py-2.5 rounded-xl shadow-sm">1</button>
+        <button onclick="kpPress('2')" class="bg-white hover:bg-slate-50 active:bg-slate-200 text-slate-900 border-b-2 border-slate-400 font-black text-xl py-2.5 rounded-xl shadow-sm">2</button>
+        <button onclick="kpPress('3')" class="bg-white hover:bg-slate-50 active:bg-slate-200 text-slate-900 border-b-2 border-slate-400 font-black text-xl py-2.5 rounded-xl shadow-sm">3</button>
+        <button onclick="kpBackspace()" class="bg-rose-600 hover:bg-rose-500 active:bg-rose-700 text-white border-b-2 border-rose-800 font-extrabold text-sm py-2.5 rounded-xl shadow-sm">DEL</button>
 
-        <button onclick="kpPress('4')" class="bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-900 border border-slate-300 font-extrabold text-xl py-2.5 rounded-xl shadow-sm">4</button>
-        <button onclick="kpPress('5')" class="bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-900 border border-slate-300 font-extrabold text-xl py-2.5 rounded-xl shadow-sm">5</button>
-        <button onclick="kpPress('6')" class="bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-900 border border-slate-300 font-extrabold text-xl py-2.5 rounded-xl shadow-sm">6</button>
-        <button onclick="kpClear()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 border border-slate-300 font-extrabold text-xs py-2.5 rounded-xl">CLEAR</button>
+        <button onclick="kpPress('4')" class="bg-white hover:bg-slate-50 active:bg-slate-200 text-slate-900 border-b-2 border-slate-400 font-black text-xl py-2.5 rounded-xl shadow-sm">4</button>
+        <button onclick="kpPress('5')" class="bg-white hover:bg-slate-50 active:bg-slate-200 text-slate-900 border-b-2 border-slate-400 font-black text-xl py-2.5 rounded-xl shadow-sm">5</button>
+        <button onclick="kpPress('6')" class="bg-white hover:bg-slate-50 active:bg-slate-200 text-slate-900 border-b-2 border-slate-400 font-black text-xl py-2.5 rounded-xl shadow-sm">6</button>
+        <button onclick="kpClear()" class="bg-slate-600 hover:bg-slate-500 active:bg-slate-700 text-white border-b-2 border-slate-800 font-extrabold text-xs py-2.5 rounded-xl shadow-sm">CLEAR</button>
 
-        <button onclick="kpPress('7')" class="bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-900 border border-slate-300 font-extrabold text-xl py-2.5 rounded-xl shadow-sm">7</button>
-        <button onclick="kpPress('8')" class="bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-900 border border-slate-300 font-extrabold text-xl py-2.5 rounded-xl shadow-sm">8</button>
-        <button onclick="kpPress('9')" class="bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-900 border border-slate-300 font-extrabold text-xl py-2.5 rounded-xl shadow-sm">9</button>
-        <button onclick="kpCommitAndNext()" class="row-span-2 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-black text-base rounded-xl shadow-md shadow-emerald-600/20 flex flex-col items-center justify-center leading-tight">
+        <button onclick="kpPress('7')" class="bg-white hover:bg-slate-50 active:bg-slate-200 text-slate-900 border-b-2 border-slate-400 font-black text-xl py-2.5 rounded-xl shadow-sm">7</button>
+        <button onclick="kpPress('8')" class="bg-white hover:bg-slate-50 active:bg-slate-200 text-slate-900 border-b-2 border-slate-400 font-black text-xl py-2.5 rounded-xl shadow-sm">8</button>
+        <button onclick="kpPress('9')" class="bg-white hover:bg-slate-50 active:bg-slate-200 text-slate-900 border-b-2 border-slate-400 font-black text-xl py-2.5 rounded-xl shadow-sm">9</button>
+        <button onclick="kpCommitAndNext()" class="row-span-2 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white border-b-2 border-emerald-800 font-black text-base rounded-xl shadow-md flex flex-col items-center justify-center leading-tight">
           <span>NEXT</span>
           <span class="text-[11px] font-bold">SLOT &rarr;</span>
         </button>
 
-        <button onclick="kpPress('0')" class="col-span-3 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-900 border border-slate-300 font-extrabold text-xl py-2.5 rounded-xl shadow-sm">0</button>
+        <button onclick="kpPress('0')" class="col-span-3 bg-white hover:bg-slate-50 active:bg-slate-200 text-slate-900 border-b-2 border-slate-400 font-black text-xl py-2.5 rounded-xl shadow-sm">0</button>
       </div>
     </div>
   </div>
@@ -203,7 +203,7 @@
       banner.classList.toggle('hidden');
     }
 
-    // Updated Default Ticket Price per Slot:
+    // Default Ticket Price per Slot:
     // Slots 1-2: $1 | 3-11: $2 | 12-27: $5 | 28-38: $10 | 39-50: $20 | 51-57: $30 | 58-62: $50
     function getDefaultSlotPrice(slotNum) {
       if (slotNum >= 1 && slotNum <= 2) return 1;
@@ -216,17 +216,31 @@
       return 5;
     }
 
-    // Distinct high-contrast color badges for each ticket dollar amount
+    // Vibrant color badges for each ticket dollar amount
     function getPriceColorClasses(price) {
       switch (Number(price)) {
-        case 1:  return "bg-slate-200 text-slate-900 border-slate-400";
-        case 2:  return "bg-sky-100 text-sky-900 border-sky-400";
-        case 5:  return "bg-emerald-100 text-emerald-900 border-emerald-400";
-        case 10: return "bg-amber-100 text-amber-900 border-amber-400";
-        case 20: return "bg-purple-100 text-purple-900 border-purple-400";
-        case 30: return "bg-rose-100 text-rose-900 border-rose-400";
-        case 50: return "bg-indigo-100 text-indigo-900 border-indigo-400";
-        default: return "bg-slate-100 text-slate-900 border-slate-300";
+        case 1:  return "bg-slate-700 text-white border-slate-800";
+        case 2:  return "bg-sky-600 text-white border-sky-700";
+        case 5:  return "bg-emerald-600 text-white border-emerald-700";
+        case 10: return "bg-amber-500 text-slate-950 border-amber-600";
+        case 20: return "bg-purple-600 text-white border-purple-700";
+        case 30: return "bg-rose-600 text-white border-rose-700";
+        case 50: return "bg-indigo-600 text-white border-indigo-700";
+        default: return "bg-slate-700 text-white border-slate-800";
+      }
+    }
+
+    // Subtle matching top header tint on each slot card
+    function getCardHeaderTint(price) {
+      switch (Number(price)) {
+        case 1:  return "bg-slate-100 border-slate-200";
+        case 2:  return "bg-sky-50 border-sky-200";
+        case 5:  return "bg-emerald-50 border-emerald-200";
+        case 10: return "bg-amber-50 border-amber-200";
+        case 20: return "bg-purple-50 border-purple-200";
+        case 30: return "bg-rose-50 border-rose-200";
+        case 50: return "bg-indigo-50 border-indigo-200";
+        default: return "bg-slate-50 border-slate-200";
       }
     }
 
@@ -317,6 +331,7 @@
 
         const isSelected = (bin.slot === activeSlotNum);
         const priceBadgeClasses = getPriceColorClasses(bin.price);
+        const headerTint = getCardHeaderTint(bin.price);
 
         const card = document.createElement('div');
         card.id = `bin-card-${bin.slot}`;
@@ -326,12 +341,12 @@
           }
         };
 
-        card.className = `p-3 rounded-2xl border-2 transition-all cursor-pointer shadow-sm ${
+        card.className = `rounded-2xl border-2 overflow-hidden transition-all cursor-pointer shadow-sm ${
           isSelected
-            ? 'bg-amber-50/70 border-amber-500 ring-2 ring-amber-400/40'
+            ? 'bg-amber-50 border-amber-500 ring-2 ring-amber-400/60 shadow-md'
             : bin.scanned 
-              ? 'bg-emerald-50/50 border-emerald-500' 
-              : 'bg-white border-slate-200 hover:border-slate-300'
+              ? 'bg-white border-emerald-500' 
+              : 'bg-white border-slate-300 hover:border-slate-400'
         }`;
 
         let closeDisplayVal = '';
@@ -346,35 +361,37 @@
         const openDisplayVal = (bin.empty && bin.open === 0 && !bin.soldOut) ? '' : bin.open;
 
         card.innerHTML = `
-          <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center justify-between px-2.5 py-2 border-b ${isSelected ? 'bg-amber-100/80 border-amber-300' : headerTint}">
             <div class="flex items-center gap-1.5">
               <span class="font-black text-slate-900 text-sm">#${bin.slot}</span>
-              ${bin.soldOut ? '<span class="text-[9px] bg-amber-200 text-amber-900 px-1.5 py-0.5 rounded font-extrabold uppercase">Out</span>' : (bin.empty ? '<span class="text-[9px] bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded font-extrabold uppercase">Empty</span>' : '')}
+              ${bin.soldOut ? '<span class="text-[9px] bg-amber-400 text-slate-950 px-1.5 py-0.5 rounded font-black uppercase">Out</span>' : (bin.empty ? '<span class="text-[9px] bg-sky-600 text-white px-1.5 py-0.5 rounded font-extrabold uppercase">Empty</span>' : '')}
             </div>
             <select onchange="updateBinPrice(${idx}, Number(this.value))" 
-                    class="font-black px-2 py-1 rounded-lg text-xs border ${priceBadgeClasses} focus:outline-none cursor-pointer">
-              ${[1, 2, 5, 10, 20, 30, 50].map(p => `<option value="${p}" ${bin.price === p ? 'selected' : ''}>$${p}</option>`).join('')}
+                    class="font-black px-2 py-0.5 rounded-lg text-xs border ${priceBadgeClasses} focus:outline-none cursor-pointer shadow-sm">
+              ${[1, 2, 5, 10, 20, 30, 50].map(p => `<option value="${p}" class="bg-white text-slate-900" ${bin.price === p ? 'selected' : ''}>$${p}</option>`).join('')}
             </select>
           </div>
 
-          <div class="grid grid-cols-2 gap-1.5 text-xs font-mono">
-            <div class="bg-slate-100 p-1.5 rounded-xl border border-slate-200 text-center">
-              <span class="text-[9px] text-slate-500 font-extrabold block uppercase">Open</span>
-              <input type="number" value="${openDisplayVal}" placeholder="--"
-                     onchange="updateBinField(${idx}, 'open', parseInt(this.value, 10) || 0)"
-                     class="w-full bg-transparent text-center font-extrabold text-slate-800 focus:outline-none" />
+          <div class="p-2.5">
+            <div class="grid grid-cols-2 gap-1.5 text-xs font-mono">
+              <div class="bg-slate-100 p-1.5 rounded-xl border border-slate-300 text-center">
+                <span class="text-[9px] text-slate-500 font-extrabold block uppercase">Open</span>
+                <input type="number" value="${openDisplayVal}" placeholder="--"
+                       onchange="updateBinField(${idx}, 'open', parseInt(this.value, 10) || 0)"
+                       class="w-full bg-transparent text-center font-black text-slate-900 focus:outline-none" />
+              </div>
+              <div class="p-1.5 rounded-xl border ${bin.scanned ? 'bg-emerald-50 border-emerald-500' : 'bg-slate-100 border-slate-300'} text-center">
+                <span class="text-[9px] ${bin.scanned ? 'text-emerald-800' : 'text-slate-500'} font-extrabold block uppercase">Close</span>
+                <input type="text" value="${closeDisplayVal}" placeholder="--" 
+                       onchange="manualCloseInput(${bin.slot}, this.value)"
+                       class="w-full bg-transparent text-center font-black ${bin.scanned ? 'text-emerald-800' : 'text-slate-900'} focus:outline-none" />
+              </div>
             </div>
-            <div class="p-1.5 rounded-xl border ${bin.scanned ? 'bg-emerald-100/70 border-emerald-400' : 'bg-slate-100 border-slate-200'} text-center">
-              <span class="text-[9px] ${bin.scanned ? 'text-emerald-800' : 'text-slate-500'} font-extrabold block uppercase">Close</span>
-              <input type="text" value="${closeDisplayVal}" placeholder="--" 
-                     onchange="manualCloseInput(${bin.slot}, this.value)"
-                     class="w-full bg-transparent text-center font-black ${bin.scanned ? 'text-emerald-800' : 'text-slate-800'} focus:outline-none" />
-            </div>
-          </div>
 
-          <div class="mt-2 pt-1.5 border-t border-slate-200 flex items-center justify-between text-xs">
-            <span class="text-slate-600 font-semibold text-[11px]">${sold} sold</span>
-            <span class="font-black ${binAmount > 0 ? 'text-emerald-700' : 'text-slate-400'}">$${binAmount.toFixed(2)}</span>
+            <div class="mt-2 pt-1.5 border-t border-slate-200 flex items-center justify-between text-xs">
+              <span class="text-slate-600 font-bold text-[11px]">${sold} sold</span>
+              <span class="font-black ${binAmount > 0 ? 'text-emerald-700' : 'text-slate-400'}">$${binAmount.toFixed(2)}</span>
+            </div>
           </div>
         `;
         grid.appendChild(card);
@@ -579,9 +596,9 @@
         const btn = document.getElementById(`btnFilter${f.charAt(0).toUpperCase() + f.slice(1)}`);
         if (btn) {
           if (f === type) {
-            btn.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-900 text-white transition";
+            btn.className = "px-3.5 py-1.5 rounded-lg text-xs font-extrabold bg-slate-900 text-white shadow-sm transition";
           } else {
-            btn.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition";
+            btn.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-700 hover:text-slate-950 transition";
           }
         }
       });
