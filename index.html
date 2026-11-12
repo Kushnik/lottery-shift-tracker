@@ -135,7 +135,7 @@
               <span id="kpSlotLabel" class="text-lg font-black text-slate-900 tracking-tight">SLOT #1</span>
               <span id="kpPriceBadge" class="text-sm font-black px-2.5 py-0.5 rounded-lg border shadow-sm">$1</span>
             </div>
-            <span id="kpOpenLabel" class="text-xs font-mono font-bold text-slate-600 block mt-0.5">Open: 0</span>
+            <span id="kpOpenLabel" class="text-xs font-mono font-bold text-slate-600 block mt-0.5">Open: --</span>
           </div>
           <button onclick="moveActiveSlot(1)" class="bg-white hover:bg-slate-200 active:bg-slate-300 text-slate-800 border border-slate-300 font-black px-3 py-2 rounded-xl text-sm shadow-sm">&rarr;</button>
         </div>
@@ -187,7 +187,7 @@
   <script>
     const GOOGLE_SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbz-LOpBatFlViqL_Jmuolou6kLOBAOg5TqElU9W4kUU-Sdi_Gd6m_CgBjh_Y6tHB-JP/exec";
     const TOTAL_SLOTS = 62;
-    const STORAGE_KEY = "roys_lottery_bins_62_v2";
+    const STORAGE_KEY = "roys_lottery_bins_62_v3";
 
     let bins = [];
     let currentShift = 1;
@@ -240,6 +240,7 @@
 
     // Michigan Lottery packs count DOWN from highest ticket # to 000
     function calculateBinSold(bin) {
+      if (bin.empty && !bin.soldOut) return 0;
       if (bin.close === null) return 0;
       if (bin.soldOut) {
         return bin.open + 1;
@@ -332,7 +333,18 @@
               : 'bg-white border-slate-200 hover:border-slate-300'
         }`;
 
-        const closeDisplayVal = bin.soldOut ? 'OUT' : (bin.close !== null ? bin.close : '');
+        // Display "OUT" when sold out, "--" when empty/skipped, or the actual close ticket number
+        let closeDisplayVal = '';
+        if (bin.soldOut) {
+          closeDisplayVal = 'OUT';
+        } else if (bin.empty) {
+          closeDisplayVal = '--';
+        } else if (bin.close !== null) {
+          closeDisplayVal = bin.close;
+        }
+
+        // Show "--" in Open box if bin is empty with 0 open so it isn't confused with ticket #000
+        const openDisplayVal = (bin.empty && bin.open === 0 && !bin.soldOut) ? '' : bin.open;
 
         card.innerHTML = `
           <div class="flex items-center justify-between mb-2">
@@ -349,7 +361,7 @@
           <div class="grid grid-cols-2 gap-1.5 text-xs font-mono">
             <div class="bg-slate-100 p-1.5 rounded-xl border border-slate-200 text-center">
               <span class="text-[9px] text-slate-500 font-extrabold block uppercase">Open</span>
-              <input type="number" value="${bin.open}" 
+              <input type="number" value="${openDisplayVal}" placeholder="--"
                      onchange="updateBinField(${idx}, 'open', parseInt(this.value, 10) || 0)"
                      class="w-full bg-transparent text-center font-extrabold text-slate-800 focus:outline-none" />
             </div>
@@ -405,8 +417,14 @@
       badge.innerText = `$${bin.price} Ticket`;
       badge.className = `text-sm font-black px-2.5 py-0.5 rounded-lg border shadow-sm ${getPriceColorClasses(bin.price)}`;
 
-      document.getElementById('kpOpenLabel').innerText = `Open: ${bin.open}`;
-      const existingVal = bin.soldOut ? "OUT" : (bin.close !== null ? bin.close : "--");
+      const openText = (bin.empty && bin.open === 0 && !bin.soldOut) ? 'Empty' : bin.open;
+      document.getElementById('kpOpenLabel').innerText = `Open: ${openText}`;
+
+      let existingVal = "--";
+      if (bin.soldOut) existingVal = "OUT";
+      else if (bin.empty) existingVal = "EMPTY";
+      else if (bin.close !== null) existingVal = bin.close;
+
       document.getElementById('kpDisplay').innerText = kpBuffer !== "" ? kpBuffer : existingVal;
     }
 
@@ -454,9 +472,10 @@
         bin.soldOut = false;
         playSuccessChime();
         if (navigator.vibrate) navigator.vibrate(60);
-      } else if (bin.close === null) {
+      } else if (bin.close === null && !bin.empty) {
         bin.close = bin.open;
         bin.scanned = true;
+        if (bin.open === 0) bin.empty = true;
       }
 
       kpBuffer = "";
@@ -469,7 +488,7 @@
       const bin = bins.find(b => b.slot === activeSlotNum);
       if (!bin) return;
 
-      bin.close = bin.open;
+      bin.close = null;
       bin.scanned = true;
       bin.empty = true;
       bin.soldOut = false;
@@ -512,6 +531,9 @@
 
     function updateBinField(idx, field, val) {
       bins[idx][field] = val;
+      if (field === 'open' && val > 0) {
+        bins[idx].empty = false;
+      }
       saveBins();
       updateKeypadHeader();
     }
@@ -526,19 +548,26 @@
       const bin = bins.find(b => b.slot === slotNum);
       if (bin) {
         const clean = val.trim().toUpperCase();
-        if (clean === '') {
+        if (clean === '' || clean === '--') {
           bin.close = null;
           bin.scanned = false;
           bin.soldOut = false;
+          bin.empty = false;
         } else if (clean === 'OUT') {
           bin.close = 0;
           bin.scanned = true;
           bin.empty = true;
           bin.soldOut = true;
+        } else if (clean === 'EMPTY') {
+          bin.close = null;
+          bin.scanned = true;
+          bin.empty = true;
+          bin.soldOut = false;
         } else {
           bin.close = parseInt(clean, 10);
           bin.scanned = true;
           bin.soldOut = false;
+          bin.empty = false;
         }
         saveBins();
         updateKeypadHeader();
@@ -648,8 +677,8 @@
         }
         b.close = null;
         b.scanned = false;
-        b.empty = false;
         b.soldOut = false;
+        // Keep empty = true if it rolled forward as empty so next shift sees '--' instead of 0
       });
 
       activeSlotNum = 1;
