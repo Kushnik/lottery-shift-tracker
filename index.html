@@ -36,7 +36,7 @@
   <main class="max-w-5xl w-full mx-auto px-4 mt-3 space-y-3 flex-1">
 
     <!-- Collapsible Employee Quick-Start Guide -->
-    <div id="helpGuideBanner" class="bg-sky-50 border border-sky-200 rounded-2xl p-3.5 shadow-sm text-xs text-slate-800">
+    <div id="helpGuideBanner" class="bg-sky-50/90 border border-sky-200 rounded-2xl p-3.5 shadow-sm text-xs text-slate-800">
       <div class="flex items-center justify-between mb-2">
         <div class="flex items-center gap-2">
           <span class="bg-sky-600 text-white font-black text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-md">Employee Guide</span>
@@ -53,29 +53,29 @@
             <li>If a pack sold completely out down through ticket <strong>000</strong> during your shift, tap <strong>PACK SOLD OUT (Through 000)</strong>.</li>
           </ul>
         </li>
-        <li><strong>New Pack Added:</strong> If you load a new pack into a slot, tap the <strong>OPEN</strong> box on that slot card to enter the starting top ticket number (e.g., <code>099</code> or <code>029</code>), and update the dollar dropdown if the ticket price changed.</li>
+        <li><strong>New Pack Added Mid-Shift:</strong> If a pack sells out and you put a new pack in that slot, first mark the old pack <strong>PACK SOLD OUT</strong> and save/roll, OR enter the starting top ticket number (e.g., <code>099</code> or <code>029</code>) into the <strong>OPEN</strong> box when loading a fresh pack into an empty slot.</li>
         <li><strong>Finish Your Shift:</strong> Once all 62 slots are checked, tap <strong>Save Shift &amp; Roll Forward</strong>. This sends your totals to the Google Sheet and automatically moves your closing numbers into the next shift's opening numbers.</li>
       </ol>
     </div>
     
     <!-- Shift Meta Header -->
-    <div class="bg-white border border-slate-200 rounded-2xl p-3 grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs shadow-sm">
+    <div class="bg-white border border-slate-200 rounded-2xl p-3.5 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs shadow-sm">
       <div>
-        <label class="block text-slate-500 text-[10px] uppercase font-bold tracking-wider mb-1">Date</label>
-        <input type="date" id="shiftDate" onchange="updateDateDisplay()" class="w-full bg-slate-50 border border-slate-300 text-slate-900 rounded-lg p-2 font-semibold focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+        <label class="block text-slate-500 text-[10px] uppercase font-extrabold tracking-wider mb-1">Date</label>
+        <input type="date" id="shiftDate" onchange="updateDateDisplay()" class="w-full bg-slate-50 border border-slate-300 text-slate-900 rounded-xl p-2 font-bold focus:ring-2 focus:ring-emerald-500 focus:outline-none">
         <span id="dayLabel" class="text-[11px] text-emerald-600 font-extrabold mt-1 block"></span>
       </div>
       <div>
-        <label class="block text-slate-500 text-[10px] uppercase font-bold tracking-wider mb-1">Shift</label>
-        <select id="shiftSelect" onchange="changeShift(this.value)" class="w-full bg-slate-50 border border-slate-300 text-slate-900 rounded-lg p-2 font-semibold focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+        <label class="block text-slate-500 text-[10px] uppercase font-extrabold tracking-wider mb-1">Shift</label>
+        <select id="shiftSelect" onchange="changeShift(this.value)" class="w-full bg-slate-50 border border-slate-300 text-slate-900 rounded-xl p-2 font-bold focus:ring-2 focus:ring-emerald-500 focus:outline-none">
           <option value="1">Shift 1 (Day / Open)</option>
           <option value="2">Shift 2 (Mid / Close)</option>
           <option value="3">Shift 3 (Night)</option>
         </select>
       </div>
       <div>
-        <label class="block text-slate-500 text-[10px] uppercase font-bold tracking-wider mb-1">Cashier</label>
-        <select id="employeeSelect" onchange="saveCurrentEmployee()" class="w-full bg-slate-50 border border-slate-300 text-slate-900 rounded-lg p-2 font-semibold focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+        <label class="block text-slate-500 text-[10px] uppercase font-extrabold tracking-wider mb-1">Cashier</label>
+        <select id="employeeSelect" onchange="saveCurrentEmployee()" class="w-full bg-slate-50 border border-slate-300 text-slate-900 rounded-xl p-2 font-bold focus:ring-2 focus:ring-emerald-500 focus:outline-none">
           <option value="Lynn Shene">Lynn Shene (Manager)</option>
           <option value="Shannon">Shannon</option>
           <option value="Jeckie">Jeckie</option>
@@ -83,8 +83,8 @@
         </select>
       </div>
       <div>
-        <label class="block text-slate-500 text-[10px] uppercase font-bold tracking-wider mb-1">Progress</label>
-        <div class="bg-slate-50 border border-slate-300 rounded-lg p-2 text-center">
+        <label class="block text-slate-500 text-[10px] uppercase font-extrabold tracking-wider mb-1">Progress</label>
+        <div class="bg-slate-50 border border-slate-300 rounded-xl p-2 text-center">
           <span id="scannedCount" class="font-black text-emerald-600 text-sm">0 / 62</span>
           <span class="text-[10px] text-slate-500 block font-semibold">Slots Checked</span>
         </div>
@@ -94,7 +94,7 @@
     <!-- Financial Card Banner -->
     <div class="bg-white border border-slate-200 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3 shadow-sm">
       <div>
-        <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Calculated Shift Sales</p>
+        <p class="text-[10px] text-slate-500 font-extrabold uppercase tracking-widest">Calculated Shift Sales</p>
         <p id="shiftTotalMoney" class="text-3xl sm:text-4xl font-black text-emerald-600 tracking-tight">$0.00</p>
         <p id="shiftTotalTickets" class="text-xs text-slate-600 font-semibold mt-0.5">0 tickets sold across 62 slots</p>
       </div>
@@ -128,12 +128,12 @@
       
       <!-- Enlarged Active Slot & Dollar Amount Banner -->
       <div class="flex items-center justify-between bg-slate-100 border border-slate-300 rounded-2xl px-3 py-2">
-        <div class="flex items-center gap-2.5">
+        <div class="flex items-center gap-2">
           <button onclick="moveActiveSlot(-1)" class="bg-white hover:bg-slate-200 active:bg-slate-300 text-slate-800 border border-slate-300 font-black px-3 py-2 rounded-xl text-sm shadow-sm">&larr;</button>
           <div>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-1.5">
               <span id="kpSlotLabel" class="text-lg font-black text-slate-900 tracking-tight">SLOT #1</span>
-              <span id="kpPriceBadge" class="text-sm font-black px-2.5 py-0.5 rounded-lg border shadow-sm">$1</span>
+              <span id="kpPriceBadge" class="text-xs font-black px-2.5 py-0.5 rounded-lg border shadow-sm">$1</span>
             </div>
             <span id="kpOpenLabel" class="text-xs font-mono font-bold text-slate-600 block mt-0.5">Open: --</span>
           </div>
@@ -141,9 +141,9 @@
         </div>
 
         <div class="flex items-center gap-2">
-          <div class="bg-white border-2 border-emerald-500 rounded-xl px-3 py-1.5 min-w-[84px] text-right shadow-sm">
+          <div class="bg-white border-2 border-emerald-500 rounded-xl px-2.5 py-1.5 min-w-[88px] text-center shadow-sm">
             <span class="text-[9px] text-slate-500 font-extrabold uppercase block leading-none">Close #</span>
-            <span id="kpDisplay" class="text-2xl font-mono font-black text-emerald-600 leading-tight">--</span>
+            <span id="kpDisplay" class="text-xl font-mono font-black text-emerald-600 leading-tight">--</span>
           </div>
           <button onclick="toggleKeypad()" class="text-slate-500 hover:text-slate-900 text-xs font-bold px-1.5 py-1">Hide</button>
         </div>
@@ -187,7 +187,7 @@
   <script>
     const GOOGLE_SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbz-LOpBatFlViqL_Jmuolou6kLOBAOg5TqElU9W4kUU-Sdi_Gd6m_CgBjh_Y6tHB-JP/exec";
     const TOTAL_SLOTS = 62;
-    const STORAGE_KEY = "roys_lottery_bins_62_v3";
+    const STORAGE_KEY = "roys_lottery_bins_62_v4";
 
     let bins = [];
     let currentShift = 1;
@@ -203,15 +203,16 @@
       banner.classList.toggle('hidden');
     }
 
-    // Default ticket price per slot matching Roy's Instant Scratch-off Lottery Log
+    // Updated Default Ticket Price per Slot:
+    // Slots 1-2: $1 | 3-11: $2 | 12-27: $5 | 28-38: $10 | 39-50: $20 | 51-57: $30 | 58-62: $50
     function getDefaultSlotPrice(slotNum) {
-      if (slotNum === 1) return 1;
-      if (slotNum >= 2 && slotNum <= 11) return 2;
+      if (slotNum >= 1 && slotNum <= 2) return 1;
+      if (slotNum >= 3 && slotNum <= 11) return 2;
       if (slotNum >= 12 && slotNum <= 27) return 5;
       if (slotNum >= 28 && slotNum <= 38) return 10;
       if (slotNum >= 39 && slotNum <= 50) return 20;
-      if (slotNum >= 51 && slotNum <= 58) return 30;
-      if (slotNum >= 59 && slotNum <= 62) return 50;
+      if (slotNum >= 51 && slotNum <= 57) return 30;
+      if (slotNum >= 58 && slotNum <= 62) return 50;
       return 5;
     }
 
@@ -333,7 +334,6 @@
               : 'bg-white border-slate-200 hover:border-slate-300'
         }`;
 
-        // Display "OUT" when sold out, "--" when empty/skipped, or the actual close ticket number
         let closeDisplayVal = '';
         if (bin.soldOut) {
           closeDisplayVal = 'OUT';
@@ -343,7 +343,6 @@
           closeDisplayVal = bin.close;
         }
 
-        // Show "--" in Open box if bin is empty with 0 open so it isn't confused with ticket #000
         const openDisplayVal = (bin.empty && bin.open === 0 && !bin.soldOut) ? '' : bin.open;
 
         card.innerHTML = `
@@ -415,7 +414,7 @@
       
       const badge = document.getElementById('kpPriceBadge');
       badge.innerText = `$${bin.price} Ticket`;
-      badge.className = `text-sm font-black px-2.5 py-0.5 rounded-lg border shadow-sm ${getPriceColorClasses(bin.price)}`;
+      badge.className = `text-xs font-black px-2.5 py-0.5 rounded-lg border shadow-sm ${getPriceColorClasses(bin.price)}`;
 
       const openText = (bin.empty && bin.open === 0 && !bin.soldOut) ? 'Empty' : bin.open;
       document.getElementById('kpOpenLabel').innerText = `Open: ${openText}`;
@@ -678,7 +677,6 @@
         b.close = null;
         b.scanned = false;
         b.soldOut = false;
-        // Keep empty = true if it rolled forward as empty so next shift sees '--' instead of 0
       });
 
       activeSlotNum = 1;
