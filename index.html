@@ -21,14 +21,42 @@
         </h1>
         <p id="headerSub" class="text-[11px] text-slate-500 font-semibold">62-Slot Continuous Shift Tracker</p>
       </div>
-      <button onclick="toggleKeypad()" id="btnToggleKeypad" class="bg-slate-900 hover:bg-slate-800 text-white font-bold px-3.5 py-2 rounded-xl text-xs shadow-sm active:scale-95 transition">
-        10-Key Pad
-      </button>
+      <div class="flex items-center gap-1.5">
+        <button onclick="toggleHelpGuide()" id="btnToggleHelp" class="bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-300 font-bold px-3 py-2 rounded-xl text-xs shadow-sm active:scale-95 transition">
+          How to Use
+        </button>
+        <button onclick="toggleKeypad()" id="btnToggleKeypad" class="bg-slate-900 hover:bg-slate-800 text-white font-bold px-3.5 py-2 rounded-xl text-xs shadow-sm active:scale-95 transition">
+          10-Key Pad
+        </button>
+      </div>
     </div>
   </header>
 
   <!-- Controls & Stats Panel -->
   <main class="max-w-5xl w-full mx-auto px-4 mt-3 space-y-3 flex-1">
+
+    <!-- Collapsible Employee Quick-Start Guide -->
+    <div id="helpGuideBanner" class="bg-sky-50 border border-sky-200 rounded-2xl p-3.5 shadow-sm text-xs text-slate-800">
+      <div class="flex items-center justify-between mb-2">
+        <div class="flex items-center gap-2">
+          <span class="bg-sky-600 text-white font-black text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-md">Employee Guide</span>
+          <h2 class="font-extrabold text-slate-900 text-sm">How to Use This Shift Tracker</h2>
+        </div>
+        <button onclick="toggleHelpGuide()" class="text-sky-700 hover:text-sky-950 font-bold text-xs underline">Hide</button>
+      </div>
+      <ol class="list-decimal list-inside space-y-1.5 text-slate-700 leading-relaxed">
+        <li><strong>Check Shift Info:</strong> Confirm the <strong>Date</strong>, <strong>Shift</strong> (1, 2, or 3), and your <strong>Cashier Name</strong> before starting.</li>
+        <li><strong>Read Front Ticket Numbers:</strong> Walk down the counter from <strong>Slot #1 to #62</strong>. Look at the bottom-right corner of the front ticket in each slot and type the last 2 or 3 digits on the <strong>10-Key Pad</strong>, then tap <strong>NEXT SLOT &rarr;</strong>.</li>
+        <li><strong>Empty or Sold-Out Bins:</strong>
+          <ul class="list-disc list-inside pl-4 mt-0.5 space-y-0.5 text-[11px] text-slate-600">
+            <li>If a slot was already empty and still has no tickets, tap <strong>EMPTY BIN (0 Sold / Skip)</strong>.</li>
+            <li>If a pack sold completely out down through ticket <strong>000</strong> during your shift, tap <strong>PACK SOLD OUT (Through 000)</strong>.</li>
+          </ul>
+        </li>
+        <li><strong>New Pack Added:</strong> If you load a new pack into a slot, tap the <strong>OPEN</strong> box on that slot card to enter the starting top ticket number (e.g., <code>099</code> or <code>029</code>), and update the dollar dropdown if the ticket price changed.</li>
+        <li><strong>Finish Your Shift:</strong> Once all 62 slots are checked, tap <strong>Save Shift &amp; Roll Forward</strong>. This sends your totals to the Google Sheet and automatically moves your closing numbers into the next shift's opening numbers.</li>
+      </ol>
+    </div>
     
     <!-- Shift Meta Header -->
     <div class="bg-white border border-slate-200 rounded-2xl p-3 grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs shadow-sm">
@@ -170,6 +198,11 @@
     let kpBuffer = "";
     let keypadVisible = true;
 
+    function toggleHelpGuide() {
+      const banner = document.getElementById('helpGuideBanner');
+      banner.classList.toggle('hidden');
+    }
+
     // Default ticket price per slot matching Roy's Instant Scratch-off Lottery Log
     function getDefaultSlotPrice(slotNum) {
       if (slotNum === 1) return 1;
@@ -246,7 +279,6 @@
         const price = getDefaultSlotPrice(i);
         arr.push({
           slot: i,
-          gameName: `Slot #${i}`,
           price: price,
           open: 0,
           close: null,
@@ -312,12 +344,6 @@
                     class="font-black px-2 py-1 rounded-lg text-xs border ${priceBadgeClasses} focus:outline-none cursor-pointer">
               ${[1, 2, 5, 10, 20, 30, 50].map(p => `<option value="${p}" ${bin.price === p ? 'selected' : ''}>$${p}</option>`).join('')}
             </select>
-          </div>
-
-          <div class="mb-2">
-            <input type="text" value="${bin.gameName}" 
-                   onchange="updateBinField(${idx}, 'gameName', this.value)"
-                   class="w-full bg-transparent border-b border-transparent hover:border-slate-300 focus:border-slate-500 text-xs text-slate-700 font-bold focus:outline-none truncate" />
           </div>
 
           <div class="grid grid-cols-2 gap-1.5 text-xs font-mono">
@@ -595,7 +621,7 @@
         totalSalesAmount: totalAmount,
         bins: bins.map(b => ({
           slot: b.slot,
-          name: b.gameName,
+          name: `Slot #${b.slot}`,
           price: b.price,
           open: b.open,
           close: b.close !== null ? b.close : b.open,
