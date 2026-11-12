@@ -21,7 +21,7 @@
     #reader video { object-fit: cover !important; border-radius: 1.25rem; width: 100% !important; height: 100% !important; }
   </style>
 </head>
-<body class="min-h-screen flex flex-col pb-28">
+<body class="min-h-screen flex flex-col pb-72">
 
   <!-- Top Sticky Header -->
   <header class="sticky top-0 z-30 bg-slate-900/95 backdrop-blur border-b border-slate-800 px-4 py-3 shadow">
@@ -31,12 +31,17 @@
           <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
           Roy's Instant Lottery
         </h1>
-        <p id="headerSub" class="text-[11px] text-slate-400 font-medium">70-Slot Continuous Shift Tracker</p>
+        <p id="headerSub" class="text-[11px] text-slate-400 font-medium">62-Slot Continuous Shift Tracker</p>
       </div>
-      <button onclick="openScannerModal()" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black px-4 py-2 rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-emerald-500/25 active:scale-95 transition">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
-        Scan Ticket
-      </button>
+      <div class="flex items-center gap-2">
+        <button onclick="toggleKeypad()" id="btnToggleKeypad" class="bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/40 font-bold px-3 py-2 rounded-xl text-xs active:scale-95 transition">
+          10-Key Pad
+        </button>
+        <button onclick="openScannerModal()" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black px-3.5 py-2 rounded-xl text-xs flex items-center gap-1.5 shadow-lg shadow-emerald-500/25 active:scale-95 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+          Scan
+        </button>
+      </div>
     </div>
   </header>
 
@@ -69,8 +74,8 @@
       <div>
         <label class="block text-slate-400 text-[10px] uppercase font-bold tracking-wider mb-1">Progress</label>
         <div class="bg-slate-800 border border-slate-700 rounded-lg p-2 text-center">
-          <span id="scannedCount" class="font-black text-emerald-400 text-sm">0 / 70</span>
-          <span class="text-[10px] text-slate-400 block font-medium">Slots Scanned</span>
+          <span id="scannedCount" class="font-black text-emerald-400 text-sm">0 / 62</span>
+          <span class="text-[10px] text-slate-400 block font-medium">Slots Checked</span>
         </div>
       </div>
     </div>
@@ -80,7 +85,7 @@
       <div>
         <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Calculated Shift Sales</p>
         <p id="shiftTotalMoney" class="text-3xl sm:text-4xl font-black text-emerald-400 tracking-tight">$0.00</p>
-        <p id="shiftTotalTickets" class="text-xs text-slate-400 font-medium mt-0.5">0 tickets sold across 70 slots</p>
+        <p id="shiftTotalTickets" class="text-xs text-slate-400 font-medium mt-0.5">0 tickets sold across 62 slots</p>
       </div>
       <div class="flex items-center gap-2">
         <button onclick="exportDataJSON()" title="Download Backup JSON" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold p-2.5 rounded-xl border border-slate-700 text-xs transition">
@@ -95,16 +100,75 @@
     <!-- Filter Pills -->
     <div class="flex items-center justify-between pt-1">
       <div class="flex gap-1.5 bg-slate-900 p-1 rounded-xl border border-slate-800">
-        <button onclick="setFilter('all')" id="btnFilterAll" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-500 text-slate-950 transition">All (70)</button>
+        <button onclick="setFilter('all')" id="btnFilterAll" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-500 text-slate-950 transition">All (62)</button>
         <button onclick="setFilter('pending')" id="btnFilterPending" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition">Pending</button>
-        <button onclick="setFilter('scanned')" id="btnFilterScanned" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition">Scanned</button>
+        <button onclick="setFilter('scanned')" id="btnFilterScanned" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition">Checked</button>
       </div>
-      <span id="lastScanBadge" class="text-[11px] font-mono text-slate-400 hidden sm:inline">Ready to scan</span>
+      <span id="lastScanBadge" class="text-[11px] font-mono text-slate-400 hidden sm:inline">Tap any slot or use 10-Key Pad</span>
     </div>
 
-    <!-- 70 Bins Grid -->
+    <!-- 62 Bins Grid -->
     <div id="binsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5 pt-1"></div>
   </main>
+
+  <!-- Rapid 10-Key Auto-Advance Bottom Keypad -->
+  <div id="rapidKeypadDrawer" class="fixed bottom-0 inset-x-0 z-40 bg-slate-900/98 backdrop-blur-lg border-t border-slate-700 shadow-2xl transition-transform duration-200">
+    <div class="max-w-lg mx-auto p-2.5 space-y-2">
+      
+      <!-- Active Slot Status Bar -->
+      <div class="flex items-center justify-between bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5">
+        <div class="flex items-center gap-2">
+          <button onclick="moveActiveSlot(-1)" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-2 py-1 rounded-lg text-xs">&larr;</button>
+          <div>
+            <span id="kpSlotLabel" class="text-xs font-black text-amber-400">SLOT #1 ($1)</span>
+            <span id="kpOpenLabel" class="text-[10px] font-mono text-slate-400 block">Open: 0</span>
+          </div>
+          <button onclick="moveActiveSlot(1)" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-2 py-1 rounded-lg text-xs">&rarr;</button>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <div class="bg-slate-900 border border-emerald-500/50 rounded-lg px-3 py-1 min-w-[76px] text-right">
+            <span class="text-[9px] text-slate-400 uppercase block leading-none">Close #</span>
+            <span id="kpDisplay" class="text-lg font-mono font-black text-emerald-400 leading-tight">--</span>
+          </div>
+          <button onclick="toggleKeypad()" class="text-slate-400 hover:text-white text-xs font-bold px-1.5 py-1">Hide</button>
+        </div>
+      </div>
+
+      <!-- Empty / Sold-Out Action Row -->
+      <div class="grid grid-cols-2 gap-1.5">
+        <button onclick="markBinEmptySkip()" class="bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-200 border border-slate-700 font-bold py-2 rounded-xl text-[11px] transition">
+          EMPTY BIN (0 Sold / Skip)
+        </button>
+        <button onclick="markBinSoldOut()" class="bg-amber-500/20 hover:bg-amber-500/30 active:bg-amber-500/40 text-amber-300 border border-amber-500/40 font-bold py-2 rounded-xl text-[11px] transition">
+          PACK SOLD OUT (Through 000)
+        </button>
+      </div>
+
+      <!-- 10-Key Numeric Pad -->
+      <div class="grid grid-cols-4 gap-1.5 font-mono">
+        <button onclick="kpPress('1')" class="bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-white font-bold text-lg py-2.5 rounded-xl">1</button>
+        <button onclick="kpPress('2')" class="bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-white font-bold text-lg py-2.5 rounded-xl">2</button>
+        <button onclick="kpPress('3')" class="bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-white font-bold text-lg py-2.5 rounded-xl">3</button>
+        <button onclick="kpBackspace()" class="bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 font-bold text-sm py-2.5 rounded-xl border border-rose-500/30">DEL</button>
+
+        <button onclick="kpPress('4')" class="bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-white font-bold text-lg py-2.5 rounded-xl">4</button>
+        <button onclick="kpPress('5')" class="bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-white font-bold text-lg py-2.5 rounded-xl">5</button>
+        <button onclick="kpPress('6')" class="bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-white font-bold text-lg py-2.5 rounded-xl">6</button>
+        <button onclick="kpClear()" class="bg-slate-800 hover:bg-slate-700 text-slate-400 font-bold text-xs py-2.5 rounded-xl">CLEAR</button>
+
+        <button onclick="kpPress('7')" class="bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-white font-bold text-lg py-2.5 rounded-xl">7</button>
+        <button onclick="kpPress('8')" class="bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-white font-bold text-lg py-2.5 rounded-xl">8</button>
+        <button onclick="kpPress('9')" class="bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-white font-bold text-lg py-2.5 rounded-xl">9</button>
+        <button onclick="kpCommitAndNext()" class="row-span-2 bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-slate-950 font-black text-sm rounded-xl shadow-lg shadow-emerald-500/20 flex flex-col items-center justify-center leading-tight">
+          <span>NEXT</span>
+          <span class="text-[10px] font-bold">SLOT &rarr;</span>
+        </button>
+
+        <button onclick="kpPress('0')" class="col-span-3 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-white font-bold text-lg py-2.5 rounded-xl">0</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Viewfinder Modal -->
   <div id="cameraModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex flex-col items-center justify-center p-3 hidden">
@@ -137,6 +201,7 @@
 
   <script>
     const GOOGLE_SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbz-LOpBatFlViqL_Jmuolou6kLOBAOg5TqElU9W4kUU-Sdi_Gd6m_CgBjh_Y6tHB-JP/exec";
+    const TOTAL_SLOTS = 62;
 
     let bins = [];
     let currentShift = 1;
@@ -146,7 +211,10 @@
     let isProcessingScan = false;
     let audioCtx = null;
 
-    // Initialize global audio context on first user tap (required by mobile Chrome/Safari)
+    let activeSlotNum = 1;
+    let kpBuffer = "";
+    let keypadVisible = true;
+
     function unlockAudio() {
       if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -156,33 +224,53 @@
       }
     }
 
+    // ========================================================
+    // COUNTDOWN SOLDOUT/SALES HELPER
+    // Michigan Lottery packs count DOWN from highest ticket # to 000.
+    // ========================================================
+    function calculateBinSold(bin) {
+      if (bin.close === null) return 0;
+      if (bin.soldOut) {
+        return bin.open + 1;
+      }
+      return Math.max(0, bin.open - bin.close);
+    }
+
     function initApp() {
       updateDateDisplay();
       const savedEmp = localStorage.getItem('roys_lottery_employee');
       if (savedEmp) document.getElementById('employeeSelect').value = savedEmp;
 
-      const saved = localStorage.getItem('roys_lottery_bins_v6');
+      const saved = localStorage.getItem('roys_lottery_bins_62');
       if (saved) {
         try {
           bins = JSON.parse(saved);
+          if (bins.length !== TOTAL_SLOTS) {
+            bins = generateSlots();
+          }
         } catch (e) {
-          bins = generate70Slots();
+          bins = generateSlots();
         }
       } else {
-        bins = generate70Slots();
+        bins = generateSlots();
       }
+
+      const firstPending = bins.find(b => !b.scanned);
+      activeSlotNum = firstPending ? firstPending.slot : 1;
+
       saveBins();
+      updateKeypadHeader();
     }
 
-    function generate70Slots() {
+    function generateSlots() {
       const arr = [];
-      for (let i = 1; i <= 70; i++) {
+      for (let i = 1; i <= TOTAL_SLOTS; i++) {
         let price = 5;
         if (i <= 8) price = 1;
-        else if (i <= 18) price = 2;
-        else if (i <= 42) price = 5;
-        else if (i <= 56) price = 10;
-        else if (i <= 66) price = 20;
+        else if (i <= 16) price = 2;
+        else if (i <= 36) price = 5;
+        else if (i <= 48) price = 10;
+        else if (i <= 58) price = 20;
         else price = 30;
 
         arr.push({
@@ -192,14 +280,16 @@
           price: price,
           open: 0,
           close: null,
-          scanned: false
+          scanned: false,
+          empty: false,
+          soldOut: false
         });
       }
       return arr;
     }
 
     function saveBins() {
-      localStorage.setItem('roys_lottery_bins_v6', JSON.stringify(bins));
+      localStorage.setItem('roys_lottery_bins_62', JSON.stringify(bins));
       renderBins();
     }
 
@@ -212,7 +302,7 @@
       let totalTickets = 0;
 
       bins.forEach((bin, idx) => {
-        const sold = bin.close !== null ? Math.max(0, bin.close - bin.open) : 0;
+        const sold = calculateBinSold(bin);
         const binAmount = sold * bin.price;
         if (bin.scanned) scannedTotal++;
         totalMoney += binAmount;
@@ -221,17 +311,31 @@
         if (currentFilter === 'pending' && bin.scanned) return;
         if (currentFilter === 'scanned' && !bin.scanned) return;
 
+        const isSelected = (bin.slot === activeSlotNum);
         const card = document.createElement('div');
         card.id = `bin-card-${bin.slot}`;
-        card.className = `p-3 rounded-2xl border transition-all ${
-          bin.scanned 
-            ? 'bg-slate-900/90 border-emerald-500/70 shadow-sm ring-1 ring-emerald-500/30' 
-            : 'bg-slate-900/60 border-slate-800 hover:border-slate-700'
+        card.onclick = (e) => {
+          if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT') {
+            selectSlotForKeypad(bin.slot);
+          }
+        };
+
+        card.className = `p-3 rounded-2xl border transition-all cursor-pointer ${
+          isSelected
+            ? 'bg-slate-900 border-amber-400 ring-2 ring-amber-400/50 shadow-lg'
+            : bin.scanned 
+              ? 'bg-slate-900/90 border-emerald-500/70 shadow-sm ring-1 ring-emerald-500/30' 
+              : 'bg-slate-900/60 border-slate-800 hover:border-slate-700'
         }`;
+
+        const closeDisplayVal = bin.soldOut ? 'OUT' : (bin.close !== null ? bin.close : '');
 
         card.innerHTML = `
           <div class="flex items-center justify-between text-xs mb-1.5">
-            <span class="font-extrabold text-white text-xs">#${bin.slot}</span>
+            <div class="flex items-center gap-1.5">
+              <span class="font-extrabold ${isSelected ? 'text-amber-400' : 'text-white'} text-xs">#${bin.slot}</span>
+              ${bin.soldOut ? '<span class="text-[9px] bg-amber-500/20 text-amber-300 border border-amber-500/40 px-1.5 py-0.2 rounded font-bold uppercase">Sold Out</span>' : (bin.empty ? '<span class="text-[9px] bg-slate-800 text-slate-400 px-1.5 py-0.2 rounded font-bold uppercase">Empty</span>' : '')}
+            </div>
             <select onchange="updateBinPrice(${idx}, Number(this.value))" 
                     class="font-black px-1.5 py-0.5 rounded text-[10px] ${bin.price >= 20 ? 'bg-amber-400 text-slate-950' : 'bg-slate-800 text-emerald-400'} border border-slate-700 focus:outline-none">
               ${[1, 2, 5, 10, 20, 30, 50].map(p => `<option value="${p}" ${bin.price === p ? 'selected' : ''}>$${p}</option>`).join('')}
@@ -260,7 +364,7 @@
             </div>
             <div class="bg-slate-950/60 p-1.5 rounded-xl border ${bin.scanned ? 'border-emerald-500/50 bg-emerald-950/10' : 'border-slate-800'} text-center">
               <span class="text-[8px] ${bin.scanned ? 'text-emerald-400' : 'text-slate-400'} font-bold block uppercase">Close</span>
-              <input type="number" value="${bin.close !== null ? bin.close : ''}" placeholder="--" 
+              <input type="text" value="${closeDisplayVal}" placeholder="--" 
                      onchange="manualCloseInput(${bin.slot}, this.value)"
                      class="w-full bg-transparent text-center font-black ${bin.scanned ? 'text-emerald-400' : 'text-slate-300'} focus:outline-none" />
             </div>
@@ -274,27 +378,177 @@
         grid.appendChild(card);
       });
 
-      document.getElementById('scannedCount').innerText = `${scannedTotal} / 70`;
+      document.getElementById('scannedCount').innerText = `${scannedTotal} / ${TOTAL_SLOTS}`;
       document.getElementById('shiftTotalMoney').innerText = `$${totalMoney.toFixed(2)}`;
-      document.getElementById('shiftTotalTickets').innerText = `${totalTickets} tickets sold`;
+      document.getElementById('shiftTotalTickets').innerText = `${totalTickets} tickets sold across ${TOTAL_SLOTS} slots`;
     }
 
+    // ========================================================
+    // RAPID 10-KEY AUTO-ADVANCE KEYPAD LOGIC
+    // ========================================================
+    function toggleKeypad() {
+      keypadVisible = !keypadVisible;
+      const drawer = document.getElementById('rapidKeypadDrawer');
+      if (keypadVisible) {
+        drawer.classList.remove('translate-y-full');
+        document.body.classList.add('pb-72');
+      } else {
+        drawer.classList.add('translate-y-full');
+        document.body.classList.remove('pb-72');
+      }
+    }
+
+    function selectSlotForKeypad(slotNum) {
+      activeSlotNum = slotNum;
+      kpBuffer = "";
+      if (!keypadVisible) toggleKeypad();
+      updateKeypadHeader();
+      renderBins();
+    }
+
+    function updateKeypadHeader() {
+      const bin = bins.find(b => b.slot === activeSlotNum) || bins[0];
+      document.getElementById('kpSlotLabel').innerText = `SLOT #${bin.slot} ($${bin.price})`;
+      document.getElementById('kpOpenLabel').innerText = `Open: ${bin.open} ${bin.gameId ? '| Game #' + bin.gameId : ''}`;
+      const existingVal = bin.soldOut ? "OUT" : (bin.close !== null ? bin.close : "--");
+      document.getElementById('kpDisplay').innerText = kpBuffer !== "" ? kpBuffer : existingVal;
+    }
+
+    function kpPress(digit) {
+      unlockAudio();
+      if (kpBuffer.length >= 4) return;
+      kpBuffer += digit;
+      document.getElementById('kpDisplay').innerText = kpBuffer;
+      if (navigator.vibrate) navigator.vibrate(25);
+    }
+
+    function kpBackspace() {
+      kpBuffer = kpBuffer.slice(0, -1);
+      updateKeypadHeader();
+    }
+
+    function kpClear() {
+      kpBuffer = "";
+      const bin = bins.find(b => b.slot === activeSlotNum);
+      if (bin) {
+        bin.close = null;
+        bin.scanned = false;
+        bin.empty = false;
+        bin.soldOut = false;
+        saveBins();
+      }
+      updateKeypadHeader();
+    }
+
+    function kpCommitAndNext() {
+      unlockAudio();
+      const bin = bins.find(b => b.slot === activeSlotNum);
+      if (!bin) return;
+
+      if (kpBuffer !== "") {
+        const enteredVal = parseInt(kpBuffer, 10);
+        if (enteredVal > bin.open && bin.open > 0) {
+          if (!confirm(`Close ticket #${enteredVal} is HIGHER than Open #${bin.open} (tickets count down to 000).\n\nDid you load a new pack? Click OK to save #${enteredVal} anyway, or Cancel to fix.`)) {
+            return;
+          }
+        }
+        bin.close = enteredVal;
+        bin.scanned = true;
+        bin.empty = false;
+        bin.soldOut = false;
+        playSuccessChime();
+        if (navigator.vibrate) navigator.vibrate(60);
+      } else if (bin.close === null) {
+        bin.close = bin.open;
+        bin.scanned = true;
+      }
+
+      kpBuffer = "";
+      saveBins();
+      moveActiveSlot(1);
+    }
+
+    function markBinEmptySkip() {
+      unlockAudio();
+      const bin = bins.find(b => b.slot === activeSlotNum);
+      if (!bin) return;
+
+      bin.close = bin.open;
+      bin.scanned = true;
+      bin.empty = true;
+      bin.soldOut = false;
+      kpBuffer = "";
+
+      if (navigator.vibrate) navigator.vibrate(40);
+      saveBins();
+      moveActiveSlot(1);
+    }
+
+    function markBinSoldOut() {
+      unlockAudio();
+      const bin = bins.find(b => b.slot === activeSlotNum);
+      if (!bin) return;
+
+      bin.close = 0;
+      bin.scanned = true;
+      bin.empty = true;
+      bin.soldOut = true;
+      kpBuffer = "";
+
+      playSuccessChime();
+      if (navigator.vibrate) navigator.vibrate([50, 40, 50]);
+      saveBins();
+      moveActiveSlot(1);
+    }
+
+    function moveActiveSlot(step) {
+      let nextSlot = activeSlotNum + step;
+      if (nextSlot > TOTAL_SLOTS) nextSlot = 1;
+      if (nextSlot < 1) nextSlot = TOTAL_SLOTS;
+      activeSlotNum = nextSlot;
+      kpBuffer = "";
+      updateKeypadHeader();
+      renderBins();
+
+      const card = document.getElementById(`bin-card-${activeSlotNum}`);
+      if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // ========================================================
+    // EXISTING FIELD UPDATES & FILTERS
+    // ========================================================
     function updateBinField(idx, field, val) {
       bins[idx][field] = val;
       saveBins();
+      updateKeypadHeader();
     }
 
     function updateBinPrice(idx, price) {
       bins[idx].price = price;
       saveBins();
+      updateKeypadHeader();
     }
 
     function manualCloseInput(slotNum, val) {
       const bin = bins.find(b => b.slot === slotNum);
       if (bin) {
-        bin.close = val === '' ? null : parseInt(val, 10);
-        bin.scanned = val !== '';
+        const clean = val.trim().toUpperCase();
+        if (clean === '') {
+          bin.close = null;
+          bin.scanned = false;
+          bin.soldOut = false;
+        } else if (clean === 'OUT') {
+          bin.close = 0;
+          bin.scanned = true;
+          bin.empty = true;
+          bin.soldOut = true;
+        } else {
+          bin.close = parseInt(clean, 10);
+          bin.scanned = true;
+          bin.soldOut = false;
+        }
         saveBins();
+        updateKeypadHeader();
       }
     }
 
@@ -314,17 +568,15 @@
     }
 
     // ========================================================
-    // RIGID LOTTERY BARCODE PARSER
+    // RIGID LOTTERY BARCODE PARSER & CAMERA SCANNER
     // ========================================================
     function parseMichiganLotteryBarcode(raw) {
       const text = raw.trim();
 
-      // Reject retail UPC barcode
       if (text.startsWith("044684") || text.startsWith("44684")) {
         return { error: "UPC ignored. Scan bottom horizontal barcode." };
       }
 
-      // Format with hyphens: 0755-082336-001
       if (text.includes("-")) {
         const parts = text.split("-");
         if (parts.length >= 3) {
@@ -335,7 +587,6 @@
         }
       }
 
-      // Numeric raw 13 or 14 digits
       const clean = text.replace(/[^0-9]/g, '');
       if (clean.length === 13 || clean.length === 14) {
         const gameId = clean.length === 14 ? clean.substring(0, 4) : clean.substring(0, 3).padStart(4, '0');
@@ -348,9 +599,6 @@
       return { error: "Invalid inventory barcode format." };
     }
 
-    // ========================================================
-    // SCAN ROUTER WITH GAME DEDUPLICATION SAFEGUARD
-    // ========================================================
     function routeScannedTicket(rawText) {
       if (isProcessingScan) return;
 
@@ -362,13 +610,11 @@
 
       isProcessingScan = true;
 
-      // Check if this Game ID has ALREADY been scanned and completed this shift
       const alreadyScannedBin = bins.find(b => 
         (b.gameId === parsed.gameId || parseInt(b.gameId, 10) === parseInt(parsed.gameId, 10)) && b.scanned
       );
 
       if (alreadyScannedBin) {
-        // REJECT DUPLICATE GAME SCAN WITH LOW BUZZ
         playWarningBuzz();
         if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
         updateCameraStatus(`
@@ -382,12 +628,10 @@
         return;
       }
 
-      // Find an unscanned slot that matches this Game ID
       let targetBin = bins.find(b => 
         (b.gameId === parsed.gameId || parseInt(b.gameId, 10) === parseInt(parsed.gameId, 10)) && !b.scanned
       );
 
-      // If game ID is new/unassigned, bind to first available unscanned slot without a game ID
       if (!targetBin) {
         targetBin = bins.find(b => !b.scanned && (!b.gameId || b.gameId === ""));
         if (!targetBin) {
@@ -402,9 +646,12 @@
       if (targetBin) {
         targetBin.close = parsed.ticketNum;
         targetBin.scanned = true;
+        targetBin.empty = false;
+        targetBin.soldOut = false;
+        activeSlotNum = targetBin.slot;
         saveBins();
+        updateKeypadHeader();
 
-        // PLAY CLEAR SUCCESS CHIME & VIBRATE
         playSuccessChime();
         if (navigator.vibrate) navigator.vibrate(120);
 
@@ -416,10 +663,9 @@
         const card = document.getElementById(`bin-card-${targetBin.slot}`);
         if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
       } else {
-        updateCameraStatus(`<span class="text-amber-400 font-bold">All 70 slots are already completed!</span>`);
+        updateCameraStatus(`<span class="text-amber-400 font-bold">All ${TOTAL_SLOTS} slots are already completed!</span>`);
       }
 
-      // 2.5 second cooldown to give cashier time to advance to next slot
       setTimeout(() => {
         isProcessingScan = false;
         document.getElementById('cameraStatusText').innerText = "Ready for next ticket...";
@@ -431,15 +677,11 @@
       document.getElementById('lastScanBadge').innerHTML = html;
     }
 
-    // ========================================================
-    // DUAL-TONE AUDIO CHIME (High Pleasant POS Register Ding)
-    // ========================================================
     function playSuccessChime() {
       try {
         unlockAudio();
         const now = audioCtx.currentTime;
 
-        // Note 1: 987.77 Hz (B5)
         const osc1 = audioCtx.createOscillator();
         const gain1 = audioCtx.createGain();
         osc1.type = 'sine';
@@ -451,7 +693,6 @@
         osc1.start(now);
         osc1.stop(now + 0.12);
 
-        // Note 2: 1760 Hz (A6 - High Chime)
         const osc2 = audioCtx.createOscillator();
         const gain2 = audioCtx.createGain();
         osc2.type = 'sine';
@@ -462,12 +703,9 @@
         gain2.connect(audioCtx.destination);
         osc2.start(now + 0.08);
         osc2.stop(now + 0.35);
-      } catch (e) {
-        console.warn("Audio chime prevented by browser:", e);
-      }
+      } catch (e) {}
     }
 
-    // Warning Buzz if the same game was already scanned
     function playWarningBuzz() {
       try {
         unlockAudio();
@@ -475,7 +713,7 @@
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(220, now); // Low warning note
+        osc.frequency.setValueAtTime(220, now);
         gain.gain.setValueAtTime(0.2, now);
         gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
         osc.connect(gain);
@@ -485,11 +723,8 @@
       } catch (e) {}
     }
 
-    // ========================================================
-    // CAMERA ENGINE
-    // ========================================================
     function openScannerModal() {
-      unlockAudio(); // Unlock Web Audio context on user tap
+      unlockAudio();
       document.getElementById('cameraModal').classList.remove('hidden');
       document.getElementById('cameraStatusText').innerText = "Starting camera...";
       isProcessingScan = false;
@@ -552,7 +787,7 @@
       let totalAmount = 0;
 
       bins.forEach(b => {
-        const sold = b.close !== null ? Math.max(0, b.close - b.open) : 0;
+        const sold = calculateBinSold(b);
         totalSold += sold;
         totalAmount += sold * b.price;
       });
@@ -577,7 +812,7 @@
           price: b.price,
           open: b.open,
           close: b.close !== null ? b.close : b.open,
-          sold: b.close !== null ? Math.max(0, b.close - b.open) : 0
+          sold: calculateBinSold(b)
         }))
       };
 
@@ -592,13 +827,23 @@
         console.error("Sheet Sync Warning:", err);
       });
 
-      // Roll forward locally
+      // Roll forward locally (if bin was marked empty/sold out, reset Open to 0 for the next pack)
       bins.forEach(b => {
-        b.open = b.close !== null ? b.close : b.open;
+        if (b.empty || b.soldOut) {
+          b.open = 0;
+        } else {
+          b.open = b.close !== null ? b.close : b.open;
+        }
         b.close = null;
         b.scanned = false;
+        b.empty = false;
+        b.soldOut = false;
       });
+
+      activeSlotNum = 1;
+      kpBuffer = "";
       saveBins();
+      updateKeypadHeader();
 
       currentShift = currentShift >= 3 ? 1 : currentShift + 1;
       document.getElementById('shiftSelect').value = currentShift;
