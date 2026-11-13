@@ -49,8 +49,8 @@
       </button>
     </div>
 
-    <!-- Collapsible Employee Quick-Start Guide -->
-    <div id="helpGuideBanner" class="bg-amber-50 border-2 border-amber-300 rounded-2xl p-3.5 shadow-sm text-xs text-slate-800">
+    <!-- Collapsible Employee Quick-Start Guide (Minimized by Default) -->
+    <div id="helpGuideBanner" class="hidden bg-amber-50 border-2 border-amber-300 rounded-2xl p-3.5 shadow-sm text-xs text-slate-800">
       <div class="flex items-center justify-between mb-2">
         <div class="flex items-center gap-2">
           <span class="bg-amber-500 text-slate-950 font-black text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-md">Employee Guide</span>
@@ -69,7 +69,7 @@
         </li>
         <li><strong>New Pack Added Mid-Shift:</strong> If a pack sells out and you put a new pack in that slot, first mark the old pack <strong>PACK SOLD OUT</strong> and save/roll, OR enter the starting top ticket number (e.g., <code>099</code> or <code>029</code>) into the <strong>OPEN</strong> box when loading a fresh pack into an empty slot.</li>
         <li><strong>Finish Your Shift:</strong> Once all 62 slots are checked, tap <strong>Save Shift &amp; Roll Forward</strong>. This sends your totals to the Google Sheet and automatically moves your closing numbers into the next shift's opening numbers.</li>
-        <li><strong>Sold a Ticket After Closing Shift?</strong> Tap <strong>Recall Last Shift</strong> next to the Save button to bring back your just-closed shift, update the new closing ticket number, and tap <strong>Update &amp; Roll Forward</strong>. It automatically updates the Google Sheet without double-counting.</li>
+        <li><strong>Sold a Ticket After Closing Shift?</strong> Tap <strong>Recall Last Shift</strong> inside the green sales box to bring back your just-closed shift, update the new closing ticket number, and tap <strong>Update &amp; Roll Forward</strong>. It automatically updates the Google Sheet without double-counting.</li>
       </ol>
     </div>
     
@@ -106,22 +106,19 @@
       </div>
     </div>
 
-    <!-- 3. Financial Sales Card (Bold Emerald Banner) -->
-    <div class="bg-gradient-to-r from-emerald-600 to-teal-700 text-white rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3 shadow-md border border-emerald-500">
-      <div>
-        <p class="text-[10px] text-emerald-100 font-extrabold uppercase tracking-widest">Calculated Shift Sales</p>
-        <p id="shiftTotalMoney" class="text-3xl sm:text-4xl font-black text-white tracking-tight">$0.00</p>
-        <p id="shiftTotalTickets" class="text-xs text-emerald-100 font-semibold mt-0.5">0 tickets sold across 62 slots</p>
+    <!-- 3. Financial Sales Card (Bold Emerald Banner with Right-Aligned Action Buttons) -->
+    <div class="bg-gradient-to-r from-emerald-600 to-teal-700 text-white rounded-2xl p-3.5 sm:p-4 flex items-center justify-between gap-2.5 shadow-md border border-emerald-500">
+      <div class="min-w-0">
+        <p class="text-[9px] sm:text-[10px] text-emerald-100 font-extrabold uppercase tracking-wider">Calculated Shift Sales</p>
+        <p id="shiftTotalMoney" class="text-2xl sm:text-4xl font-black text-white tracking-tight leading-tight">$0.00</p>
+        <p id="shiftTotalTickets" class="text-[11px] sm:text-xs text-emerald-100 font-semibold mt-0.5 truncate">0 tickets sold (62 slots)</p>
       </div>
-      <div class="flex flex-wrap items-center gap-2">
-        <button onclick="recallPreviousShift()" id="btnRecallShift" class="hidden bg-amber-400 hover:bg-amber-300 text-slate-950 font-black px-3 py-3 rounded-xl text-xs active:scale-95 transition shadow-md text-center">
-          Recall<br><span class="text-[10px] font-extrabold">Last Shift</span>
+      <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+        <button onclick="recallPreviousShift()" id="btnRecallShift" class="hidden bg-amber-400 hover:bg-amber-300 text-slate-950 font-black px-2.5 sm:px-3.5 py-2.5 sm:py-3 rounded-xl text-[11px] sm:text-xs active:scale-95 transition shadow-md text-center leading-tight">
+          Recall<br><span class="text-[9px] sm:text-[10px] font-extrabold">Last Shift</span>
         </button>
-        <button onclick="exportDataJSON()" title="Download Backup JSON" class="bg-emerald-800/70 hover:bg-emerald-800 text-white font-bold p-3 rounded-xl border border-emerald-400/40 text-xs transition shadow-sm">
-          &#128190;
-        </button>
-        <button onclick="closeAndRollShift()" id="btnSaveRoll" class="bg-white hover:bg-emerald-50 text-emerald-900 font-black px-4 py-3 rounded-xl text-xs active:scale-95 transition shadow-md text-center">
-          Save Shift &<br><span class="text-emerald-700 font-extrabold">Roll Forward</span>
+        <button onclick="closeAndRollShift()" id="btnSaveRoll" class="bg-white hover:bg-emerald-50 text-emerald-900 font-black px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl text-[11px] sm:text-xs active:scale-95 transition shadow-md text-center leading-tight">
+          Save Shift &amp;<br><span class="text-emerald-700 font-extrabold">Roll Forward</span>
         </button>
       </div>
     </div>
@@ -503,7 +500,7 @@
 
       document.getElementById('scannedCount').innerText = `${scannedTotal} / ${TOTAL_SLOTS}`;
       document.getElementById('shiftTotalMoney').innerText = `$${totalMoney.toFixed(2)}`;
-      document.getElementById('shiftTotalTickets').innerText = `${totalTickets} tickets sold across ${TOTAL_SLOTS} slots`;
+      document.getElementById('shiftTotalTickets').innerText = `${totalTickets} tickets sold (${TOTAL_SLOTS} slots)`;
     }
 
     // ========================================================
@@ -827,16 +824,6 @@
       currentShift = currentShift >= 3 ? 1 : currentShift + 1;
       document.getElementById('shiftSelect').value = currentShift;
       alert(wasEditing ? `Previous shift updated in Google Sheet and rolled forward!` : `Shift completed! Data transmitted to Google Sheet.`);
-    }
-
-    function exportDataJSON() {
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(bins, null, 2));
-      const dl = document.createElement('a');
-      dl.setAttribute("href", dataStr);
-      dl.setAttribute("download", `roys_lottery_shift_${document.getElementById('shiftDate').value}.json`);
-      document.body.appendChild(dl);
-      dl.click();
-      dl.remove();
     }
 
     function updateDateDisplay() {
